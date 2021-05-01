@@ -3,10 +3,16 @@ import "./ShowProduct.less";
 import { RouteComponentProps, Link } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { Row, Col, Card, Carousel, Image, Typography, Badge, Tabs } from "antd";
+import {
+  HeartOutlined,
+  ShoppingCartOutlined,
+  StarOutlined,
+} from "@ant-design/icons";
+import StarRating from "react-star-ratings";
+import { RatingModal } from "../";
 import { RootState } from "../../../../const/types";
-import { makeCamelCaseString } from "../../../../utils/UtilityFunc";
-import { Product } from "../../../../const/types/product";
 import { SubCategory } from "../../../../const/types/sub-category";
+import { onBoardingRoutes } from "../../../../const/routes";
 
 const { TabPane } = Tabs;
 
@@ -19,15 +25,31 @@ type ParamsType = {
 };
 
 function ShowProduct(props: RouteComponentProps) {
-  const { match } = props;
+  const { match, history, location } = props;
   const { params } = match;
   let { productCategory, productId, productSlug } = params as ParamsType;
 
-  const { product } = useSelector(({ product }: RootState) => ({
+  const { product, user } = useSelector(({ product, user }: RootState) => ({
     product: product.bestSellers[productId] || product.newArrivals[productId],
+    user: user,
   }));
 
-  console.log(product);
+  const [showRatingModal, setShowRatingModal] = useState(false);
+
+  console.log("userId", user._id);
+  const handleRating = () => {
+    if (user._id) {
+      setShowRatingModal(true);
+    } else {
+      history.push(onBoardingRoutes.LOGIN, { from: location.pathname });
+      return;
+      // Another way
+      history.push({
+        pathname: onBoardingRoutes.LOGIN,
+        state: { from: location.pathname },
+      });
+    }
+  };
 
   if (!product) return null;
 
@@ -54,7 +76,35 @@ function ShowProduct(props: RouteComponentProps) {
           </Carousel>
         </Col>
         <Col span={10}>
-          <Card title="Product Detail" className="product-details-card">
+          {showRatingModal && (
+            <RatingModal
+              visible={showRatingModal}
+              changeRating={() => {}}
+              name={product._id}
+              rating={3}
+              onCancel={() => setShowRatingModal(false)}
+            />
+          )}
+          <Card
+            title="Product Detail"
+            className="product-details-card"
+            actions={[
+              <span key="shopping cart">
+                <ShoppingCartOutlined /> <br />
+                Add to cart
+              </span>,
+              <span key="add to whishlist">
+                <HeartOutlined />
+                <br />
+                Add to wishlist
+              </span>,
+              <span key="add rating" role="button" onClick={handleRating}>
+                <StarOutlined />
+                <br />
+                {user._id ? "Leave rating" : "Login to leave rating"}
+              </span>,
+            ]}
+          >
             <Row
               align="middle"
               justify="space-between"

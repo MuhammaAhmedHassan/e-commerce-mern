@@ -9,7 +9,12 @@ import {
   UserReduxState,
 } from "../../const/types";
 import { AppLocalStorage } from "../../utils/AppLocalStorage";
-import { adminRoutes, onBoardingRoutes, userRoutes } from "../../const/routes";
+import {
+  adminRoutes,
+  generalRoutes,
+  onBoardingRoutes,
+  userRoutes,
+} from "../../const/routes";
 import { printMessage } from "../../const/printMessage";
 import { AuthServices } from "../../services/auth.services";
 import { setAlertMessage } from "./alert.action";
@@ -22,6 +27,13 @@ const userAction = (
   payload,
 });
 
+const isGeneralRoute = () => {
+  const pathname = window.location.pathname;
+  const generalRoutes = ["/new-arrivals", "/best-sellers"];
+  if (generalRoutes.some((r) => pathname.indexOf(r) > -1)) return true;
+  else return false;
+};
+
 export const roleBasedRedirect = (
   history: History<unknown>,
   _role?: string | null
@@ -29,14 +41,20 @@ export const roleBasedRedirect = (
   const role = AppLocalStorage.getItem("USER_ROLE") || _role;
   const pathname = window.location.pathname;
   let pathExists: boolean = false;
+  const hasState = !!history.location.state;
 
-  if (pathname === "/") return;
-  else if (role === "admin") {
+  debugger;
+  if (isGeneralRoute()) return;
+  else if (pathname === "/") return;
+  else if (hasState) {
+    const route = (history.location.state as { from: string }).from;
+    history.push(route);
+  } else if (role === "admin") {
     pathExists = Object.values(adminRoutes).some((path) => path === pathname);
     history.push(pathExists ? pathname : adminRoutes.DASHBOARD);
   } else {
     pathExists = Object.values(userRoutes).some((path) => path === pathname);
-    history.push(pathExists ? pathname : userRoutes.HISTORY);
+    history.push(pathExists ? pathname : generalRoutes.HOME_PAGE);
   }
 };
 
@@ -79,7 +97,7 @@ export const logoutUser = () => async (
     AppLocalStorage.removeItem("USER_AUTH_TOKEN");
     AppLocalStorage.removeItem("USER_ROLE");
     dispatch(userAction("LOGOUT"));
-    dispatch(push(onBoardingRoutes.LOGIN));
+    dispatch(push(generalRoutes.HOME_PAGE));
   } catch (err) {
     printMessage("logoutUser", err);
   }

@@ -1,7 +1,7 @@
 import { ReactElement, useEffect } from "react";
 import { Switch, Route, useHistory } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { baseRoutes, onBoardingRoutes } from "../const/routes";
+import { baseRoutes, generalRoutes, onBoardingRoutes } from "../const/routes";
 import OnBoardingRouter from "./OnBoarding";
 import UserRouter from "./User";
 import AdminRouter from "./Admin";
@@ -33,7 +33,7 @@ function Routes(): ReactElement {
 
   useEffect(() => {
     if (!token()) {
-      history.push(onBoardingRoutes.LOGIN);
+      history.push(generalRoutes.HOME_PAGE);
       return;
     }
     roleBasedRedirect(history, role);

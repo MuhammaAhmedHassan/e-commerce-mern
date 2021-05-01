@@ -4,6 +4,7 @@ import { User } from "../models/user.model";
 import slugify from "slugify";
 import { BadRequestError } from "../errors/bad-request-error";
 import { removeImagesUtilFunc } from "../utils/cloudinary.utils";
+import { LeanDocument } from "mongoose";
 
 export const createProduct = async (req: Request, res: Response) => {
   console.log("product.controller.ts => createProduct()", req.body);
@@ -140,13 +141,21 @@ export const updatedProductRating = async (req: Request, res: Response) => {
 
   if (!product) throw new BadRequestError("Product not found");
 
-  const user = await User.findOne({ email: req.user.email }).exec();
+  const user = await User.findOne({ email: req.user.email }).lean().exec();
 
-  const existingRatingObject = product.ratings.find(
-    (elem) => elem.postedBy.toString() === user?._id.toString()
-  );
+  let updatedProduct: ProductDoc | null = null;
+  let existingRatingObject:
+    | LeanDocument<{
+        star: number;
+        postedBy: string;
+      }>
+    | undefined;
 
-  let updatedProduct: ProductDoc | null;
+  if (Array.isArray(product.ratings))
+    existingRatingObject = product.ratings?.find(
+      (elem) => elem.postedBy.toString() === user?._id.toString()
+    );
+
   if (existingRatingObject === undefined) {
     updatedProduct = await Product.findByIdAndUpdate(
       productId,
@@ -155,26 +164,15 @@ export const updatedProductRating = async (req: Request, res: Response) => {
       },
       { new: true }
     ).exec();
+  } else {
+    updatedProduct = await Product.findOneAndUpdate(
+      { _id: productId, ratings: { $elemMatch: existingRatingObject } },
+      { $set: { "ratings.$.star": star } },
+      { new: true }
+    ).exec();
   }
 
-  await Product.findByIdAndUpdate(
-    productId,
-    {
-      $set: { "ratings.$.star": star },
-      $setOnInsert: {
-        "ratings.$.star": star,
-        "ratings.$.postedBy": user?._id,
-      },
-    },
-    {
-      upsert: true,
-      arrayFilters: [
-        {
-          "ratings.postedBy": user?._id,
-        },
-      ],
-    }
-  ).exec();
+  res.json(updatedProduct);
 };
 
 // export const testBestSelles = async (req: Request, res: Response) => {

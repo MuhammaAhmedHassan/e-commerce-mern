@@ -1,4 +1,3 @@
-import React from "react";
 import { Switch, Route, Redirect, RouteComponentProps } from "react-router-dom";
 import { onBoardingRoutes } from "../../const/routes";
 import { SignUp, Login, RegisterComplete, ForgotPassword } from "./components";

@@ -24,11 +24,21 @@ if (token) {
 export default function (state = initialState, action: UserReducerActionTypes) {
   switch (action.type) {
     case "LOGGED_IN_USER":
-    case "LOGOUT":
     case "LOADING_USER":
       return {
         ...state,
         ...action.payload,
+      };
+
+    case "LOGOUT":
+      return {
+        ...state,
+        loading: false,
+        email: null,
+        token: null,
+        name: null,
+        role: null,
+        _id: null,
       };
 
     default:
