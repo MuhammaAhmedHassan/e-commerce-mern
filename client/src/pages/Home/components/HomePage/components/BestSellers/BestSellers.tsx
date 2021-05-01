@@ -7,6 +7,7 @@ import { RootState } from "../../../../../../const/types";
 import { readHomePageProducts } from "../../../../../../redux/actions/product.action";
 import Spinner from "../../../../../../shared/components/Spinner";
 import { generalRoutes } from "../../../../../../const/routes";
+import AverageStarRating from "../../../AverageStarRating";
 
 const { Paragraph, Title } = Typography;
 
@@ -65,8 +66,9 @@ function BestSellers() {
             className="product-list"
             renderItem={(item) => {
               return (
-                <Col>
+                <Col key={item._id}>
                   <List.Item>
+                    <AverageStarRating product={item} />
                     <Card
                       className="product-card"
                       cover={

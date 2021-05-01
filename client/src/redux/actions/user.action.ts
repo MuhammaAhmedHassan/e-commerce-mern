@@ -43,7 +43,6 @@ export const roleBasedRedirect = (
   let pathExists: boolean = false;
   const hasState = !!history.location.state;
 
-  debugger;
   if (isGeneralRoute()) return;
   else if (pathname === "/") return;
   else if (hasState) {

@@ -10,10 +10,11 @@ interface Props {
   changeRating: (newRating: number, name: string) => void;
   rating: number;
   onCancel(): void;
+  closable: boolean;
 }
 
 function RatingModal(props: Props) {
-  const { visible, name, changeRating, rating, onCancel } = props;
+  const { visible, name, changeRating, rating, onCancel, closable } = props;
 
   return (
     <Modal
@@ -22,6 +23,7 @@ function RatingModal(props: Props) {
       visible={visible}
       footer={null}
       onCancel={onCancel}
+      closable={closable}
     >
       <StarRating
         rating={rating}

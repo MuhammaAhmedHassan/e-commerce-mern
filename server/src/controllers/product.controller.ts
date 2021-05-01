@@ -22,7 +22,7 @@ export const createProduct = async (req: Request, res: Response) => {
 export const readProducts = async (req: Request, res: Response) => {
   const page = parseInt(req.query.page as string) || 1;
   const limit = parseInt(req.query.limit as string) || 10;
-  const sort = req.query.sort as string;
+  const sort = (req.query.sort as string) || "createdAt";
 
   if (isNaN(page) || isNaN(limit) || sort.length < 1) {
     throw new BadRequestError(

@@ -14,6 +14,7 @@ import {
   ReadProductsPerPage,
   ResponseImageType,
   UpdateProduct,
+  UpdateProductRating,
 } from "../../const/types/product";
 import { ProductServices } from "../../services/product.services";
 import { resizeFile } from "../../utils/fileResizer";
@@ -168,6 +169,39 @@ export const readHomePageProducts = (
         payload: { products: data, page: pageNumber, total },
       });
     }
+
+    if (callback) callback();
+  } catch ({ response }) {
+    printMessage("product.action => readAllProducts()", response);
+    if (response?.data?.errors) {
+      alertMsg = createAlert("error", response.data.errors[0].message);
+    }
+  } finally {
+    dispatch(productLoading(false));
+    dispatch(setAlertMessage(alertMsg));
+  }
+};
+
+export const updateProductRating = (
+  options: {
+    star: number;
+    productId: string;
+    productCategory: string;
+  },
+  callback?: () => void
+) => async (
+  dispatch: ThunkDispatch<{}, {}, ProductLoading | UpdateProductRating>
+) => {
+  const { productCategory, ...rest } = options;
+  try {
+    dispatch(productLoading(true));
+    const product = (await ProductServices.updateProductRating(rest))
+      .data as Product;
+
+    dispatch({
+      type: "UPDATE_PRODUCT_RATING",
+      payload: { product, productCategory },
+    });
 
     if (callback) callback();
   } catch ({ response }) {

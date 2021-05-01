@@ -122,6 +122,14 @@ export type UpdateProduct = {
   };
 };
 
+export type UpdateProductRating = {
+  type: "UPDATE_PRODUCT_RATING";
+  payload: {
+    product: Product;
+    productCategory: string;
+  };
+};
+
 export type ProductActionTypes =
   | ProductLoading
   | CreateProduct
@@ -131,4 +139,5 @@ export type ProductActionTypes =
   | HomePageProductsBestSellers
   | HomePageProductsNewArrivals
   | DeleteProduct
-  | UpdateProduct;
+  | UpdateProduct
+  | UpdateProductRating;

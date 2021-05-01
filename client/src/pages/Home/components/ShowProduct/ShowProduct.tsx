@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import "./ShowProduct.less";
 import { RouteComponentProps, Link } from "react-router-dom";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import { Row, Col, Card, Carousel, Image, Typography, Badge, Tabs } from "antd";
 import {
   HeartOutlined,
@@ -9,10 +9,11 @@ import {
   StarOutlined,
 } from "@ant-design/icons";
 import StarRating from "react-star-ratings";
-import { RatingModal } from "../";
+import { RatingModal, AverageStarRating } from "../";
 import { RootState } from "../../../../const/types";
 import { SubCategory } from "../../../../const/types/sub-category";
 import { onBoardingRoutes } from "../../../../const/routes";
+import { updateProductRating } from "../../../../redux/actions/product.action";
 
 const { TabPane } = Tabs;
 
@@ -29,14 +30,29 @@ function ShowProduct(props: RouteComponentProps) {
   const { params } = match;
   let { productCategory, productId, productSlug } = params as ParamsType;
 
+  const dispatch = useDispatch();
   const { product, user } = useSelector(({ product, user }: RootState) => ({
     product: product.bestSellers[productId] || product.newArrivals[productId],
     user: user,
   }));
 
   const [showRatingModal, setShowRatingModal] = useState(false);
+  const [modalClosable, setModalClosable] = useState(true);
+  const [starRating, setStarRating] = useState(0);
 
-  console.log("userId", user._id);
+  useEffect(() => {
+    if (Array.isArray(product?.ratings) && user) {
+      const userStarRating = product.ratings.find(
+        (elm) => elm.postedBy.toString() === user._id?.toString()
+      );
+      if (userStarRating) {
+        setStarRating(userStarRating.star);
+      }
+    }
+  }, []);
+
+  if (!product) return null;
+
   const handleRating = () => {
     if (user._id) {
       setShowRatingModal(true);
@@ -51,7 +67,18 @@ function ShowProduct(props: RouteComponentProps) {
     }
   };
 
-  if (!product) return null;
+  const handleRatingChange = (star: number, productId: string) => {
+    setModalClosable(false);
+    const callback = () => {
+      setShowRatingModal(false);
+      setModalClosable(true);
+      setStarRating(star);
+    };
+
+    dispatch(
+      updateProductRating({ star, productId, productCategory }, callback)
+    );
+  };
 
   return (
     <div>
@@ -79,9 +106,10 @@ function ShowProduct(props: RouteComponentProps) {
           {showRatingModal && (
             <RatingModal
               visible={showRatingModal}
-              changeRating={() => {}}
+              changeRating={handleRatingChange}
               name={product._id}
-              rating={3}
+              rating={starRating}
+              closable={modalClosable}
               onCancel={() => setShowRatingModal(false)}
             />
           )}
@@ -105,6 +133,9 @@ function ShowProduct(props: RouteComponentProps) {
               </span>,
             ]}
           >
+            <Row align="middle" justify="center">
+              <AverageStarRating product={product} />
+            </Row>
             <Row
               align="middle"
               justify="space-between"
@@ -137,9 +168,9 @@ function ShowProduct(props: RouteComponentProps) {
               className="product-details-item"
             >
               <span>Sub Categories</span>
-              {(product.subCategories as SubCategory[]).map((s) => (
+              {(product.subCategories as SubCategory[]).map((s, i) => (
                 <Badge
-                  key={s._id}
+                  key={s._id + i}
                   className="site-badge-count-109"
                   count={s.name}
                   style={{ backgroundColor: "#52c41a" }}

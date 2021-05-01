@@ -72,6 +72,24 @@ export default function (state = initialState, action: ProductActionTypes) {
       delete state.productsPerPage[action.payload.productId];
       return { ...state, productsPerPage: { ...state.productsPerPage } };
 
+    case "UPDATE_PRODUCT_RATING":
+      if (action.payload.productCategory === "best-sellers")
+        return {
+          ...state,
+          bestSellers: {
+            ...state.bestSellers,
+            [action.payload.product._id]: action.payload.product,
+          },
+        };
+      else
+        return {
+          ...state,
+          newArrivals: {
+            ...state.newArrivals,
+            [action.payload.product._id]: action.payload.product,
+          },
+        };
+
     default:
       return state;
   }

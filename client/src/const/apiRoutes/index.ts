@@ -35,5 +35,5 @@ export const productApiRoutes = {
   readPerPage: "/product",
   getAll: "/all-products",
 
-  testBestSellers: "/product/:page/:limit/:sort",
+  updateRating: "/product/star/${productId}",
 };

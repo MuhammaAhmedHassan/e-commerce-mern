@@ -7,6 +7,7 @@ import { readHomePageProducts } from "../../../../../../redux/actions/product.ac
 import Spinner from "../../../../../../shared/components/Spinner";
 import { generalRoutes } from "../../../../../../const/routes";
 import { EyeOutlined, ShoppingCartOutlined } from "@ant-design/icons";
+import AverageStarRating from "../../../AverageStarRating";
 
 const { Paragraph, Title } = Typography;
 
@@ -71,8 +72,9 @@ function NewArrivals() {
             className="product-list"
             renderItem={(item) => {
               return (
-                <Col>
+                <Col key={item._id}>
                   <List.Item>
+                    <AverageStarRating product={item} />
                     <Card
                       className="product-card"
                       cover={

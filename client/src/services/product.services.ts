@@ -15,7 +15,7 @@ const {
   getAll,
   delete: deleteProduct,
   readPerPage,
-  testBestSellers,
+  updateRating,
 } = productApiRoutes;
 
 export class ProductServices {
@@ -45,6 +45,15 @@ export class ProductServices {
   static async updateProduct(product: ProductFormValues, id: string) {
     const url = update.replace("${productId}", id);
     return await HTTP.put(url, product);
+  }
+
+  static async updateProductRating(options: {
+    star: number;
+    productId: string;
+  }) {
+    const { star, productId } = options;
+    const url = updateRating.replace("${productId}", productId);
+    return await HTTP.put(url, { star });
   }
 
   static async deleteProduct(productId: string) {
