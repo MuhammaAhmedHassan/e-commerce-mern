@@ -21,7 +21,7 @@ function ShowRecentProducts() {
   return (
     <div>
       <Row align="middle" justify="center" className="mt-1">
-        <Title level={1}>Recent Arrives</Title>
+        <Title level={1}>Related Products</Title>
       </Row>
       <Row align="middle" justify="center" className="mt-1">
         <Col>
