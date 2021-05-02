@@ -33,10 +33,12 @@ function Routes(): ReactElement {
 
   useEffect(() => {
     if (!token()) {
-      history.push(generalRoutes.HOME_PAGE);
-      return;
-    }
-    roleBasedRedirect(history, role);
+      const pathname = window.location.pathname;
+      const isUserRoute = pathname.indexOf("user") !== -1;
+      const isAdminRoute = pathname.indexOf("admin") !== -1;
+      if (!isUserRoute || !isAdminRoute) return;
+      else history.push(generalRoutes.HOME_PAGE);
+    } else roleBasedRedirect(history, role);
   }, [token()]);
 
   return (

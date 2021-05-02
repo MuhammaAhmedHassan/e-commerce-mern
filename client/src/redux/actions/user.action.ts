@@ -29,8 +29,10 @@ const userAction = (
 
 const isGeneralRoute = () => {
   const pathname = window.location.pathname;
-  const generalRoutes = ["/new-arrivals", "/best-sellers"];
-  if (generalRoutes.some((r) => pathname.indexOf(r) > -1)) return true;
+  const isAdminRoute = pathname.indexOf("admin") !== -1;
+  const isUserRoute = pathname.indexOf("user") !== -1;
+  const isHomeRoute = pathname === "/";
+  if (!isAdminRoute || !isUserRoute || isHomeRoute) return true;
   else return false;
 };
 
@@ -44,7 +46,6 @@ export const roleBasedRedirect = (
   const hasState = !!history.location.state;
 
   if (isGeneralRoute()) return;
-  else if (pathname === "/") return;
   else if (hasState) {
     const route = (history.location.state as { from: string }).from;
     history.push(route);
@@ -96,7 +97,8 @@ export const logoutUser = () => async (
     AppLocalStorage.removeItem("USER_AUTH_TOKEN");
     AppLocalStorage.removeItem("USER_ROLE");
     dispatch(userAction("LOGOUT"));
-    dispatch(push(generalRoutes.HOME_PAGE));
+
+    if (!isGeneralRoute()) dispatch(push(generalRoutes.HOME_PAGE));
   } catch (err) {
     printMessage("logoutUser", err);
   }

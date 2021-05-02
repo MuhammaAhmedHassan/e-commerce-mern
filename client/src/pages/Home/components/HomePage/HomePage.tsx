@@ -1,8 +1,6 @@
 import { NewArrivals, BestSellers } from "./components";
 
 function HomePage() {
-  // if (loading) return <Spinner />;
-
   return (
     <div>
       <NewArrivals />

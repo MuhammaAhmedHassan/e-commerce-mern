@@ -1,4 +1,3 @@
-import React from "react";
 import "./User.less";
 import { Switch, Route, RouteComponentProps } from "react-router-dom";
 
@@ -8,11 +7,6 @@ import { HistoryPage, Whishlist, UpdatePassword } from "./component";
 import DashboardLayout from "../../shared/components/DashboardLayout";
 
 function UserRouter(props: RouteComponentProps) {
-  const {
-    match,
-    location: { pathname },
-  } = props;
-
   return (
     <DashboardLayout {...props}>
       <Switch>
