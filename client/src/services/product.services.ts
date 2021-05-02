@@ -10,12 +10,13 @@ import { HTTP } from "../utils/Http";
 // delete: deleteProduct maybe because 'delete' is a reserve word
 const {
   create,
-  read,
+  readSingleProduct,
   update,
   getAll,
   delete: deleteProduct,
   readPerPage,
   updateRating,
+  relatedProducts,
 } = productApiRoutes;
 
 export class ProductServices {
@@ -54,6 +55,16 @@ export class ProductServices {
     const { star, productId } = options;
     const url = updateRating.replace("${productId}", productId);
     return await HTTP.put(url, { star });
+  }
+
+  static async fetchSingleProduct(productId: string) {
+    const url = readSingleProduct.replace("${productId}", productId);
+    return await HTTP.get(url);
+  }
+
+  static async fetchRelatedProducts(productId: string) {
+    const url = relatedProducts.replace("${productId}", productId);
+    return await HTTP.get(url);
   }
 
   static async deleteProduct(productId: string) {

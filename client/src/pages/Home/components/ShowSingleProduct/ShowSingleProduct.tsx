@@ -1,8 +1,13 @@
 import { useEffect } from "react";
 import { RouteComponentProps } from "react-router-dom";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import { RootState } from "../../../../const/types";
 import ShowProduct from "../ShowProduct";
+import {
+  fetchRelatedProduct,
+  fetchSingleProduct,
+} from "../../../../redux/actions/product.action";
+import { ShowRecentProducts } from "..";
 
 type ParamsType = {
   productCategory: string;
@@ -14,30 +19,44 @@ type ParamsType = {
 // type of product we're displaying, e.g., new-arrivals,
 // best-sellers or recent products
 function ShowSingleProduct(props: RouteComponentProps) {
-  const { match, history, location } = props;
+  const { match } = props;
   const { params } = match;
   let { productCategory, productId, productSlug } = params as ParamsType;
 
-  const { product, user } = useSelector(({ product, user }: RootState) => ({
-    product: product.bestSellers[productId] || product.newArrivals[productId],
+  const dispatch = useDispatch();
+  const { product } = useSelector(({ product, user }: RootState) => ({
+    product:
+      product.bestSellers[productId] ||
+      product.newArrivals[productId] ||
+      product.singleProduct,
     user: user,
   }));
 
   useEffect(() => {
-    if (!product) {
-      // then send request to backend for product
-    }
-  }, []);
+    // then send request to backend for the product
+    dispatch(fetchSingleProduct(productId));
+    return () => {};
+  }, [productId]);
 
   useEffect(() => {
     if (product) {
       // then send request to backend for related products
+      dispatch(fetchRelatedProduct(product._id));
     }
-  }, []);
+  }, [product]);
 
   if (!product) return null;
 
-  return <ShowProduct {...props} />;
+  return (
+    <>
+      <ShowProduct
+        {...props}
+        product={product}
+        productCategory={productCategory}
+      />
+      <ShowRecentProducts />
+    </>
+  );
 }
 
 export default ShowSingleProduct;

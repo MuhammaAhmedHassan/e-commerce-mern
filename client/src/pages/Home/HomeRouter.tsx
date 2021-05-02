@@ -1,17 +1,17 @@
-import { Switch, Route, Redirect, RouteComponentProps } from "react-router-dom";
+import { Switch, Route, RouteComponentProps } from "react-router-dom";
 import { generalRoutes } from "../../const/routes";
 import NotFound from "../../shared/components/404NotFound";
-import { HomePage, ShowProduct } from "./components";
+import { HomePage, ShowSingleProduct } from "./components";
 
-function HomeRouter(props: RouteComponentProps) {
-  const {
-    match: { path },
-  } = props;
-
+function HomeRouter(_: RouteComponentProps) {
   return (
     <Switch>
       <Route exact path={generalRoutes.HOME_PAGE} component={HomePage} />
-      <Route exact path={generalRoutes.PRODUCT_PAGE} component={ShowProduct} />
+      <Route
+        exact
+        path={generalRoutes.PRODUCT_PAGE}
+        component={ShowSingleProduct}
+      />
       <Route component={NotFound} />
     </Switch>
   );

@@ -29,11 +29,12 @@ export const subCategoryApiRoutes = {
 // Product api routes
 export const productApiRoutes = {
   create: "/product",
-  read: "/product",
+  readSingleProduct: "/product/${productId}",
   update: "/product/${productId}",
   delete: "/product/${productId}",
   readPerPage: "/product",
   getAll: "/all-products",
 
   updateRating: "/product/star/${productId}",
+  relatedProducts: "/product/related/${productId}",
 };

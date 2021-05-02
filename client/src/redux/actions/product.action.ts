@@ -15,6 +15,8 @@ import {
   ResponseImageType,
   UpdateProduct,
   UpdateProductRating,
+  FetchSingleProduct,
+  FetchRelatedProduct,
 } from "../../const/types/product";
 import { ProductServices } from "../../services/product.services";
 import { resizeFile } from "../../utils/fileResizer";
@@ -201,6 +203,62 @@ export const updateProductRating = (
     dispatch({
       type: "UPDATE_PRODUCT_RATING",
       payload: { product, productCategory },
+    });
+
+    if (callback) callback();
+  } catch ({ response }) {
+    printMessage("product.action => readAllProducts()", response);
+    if (response?.data?.errors) {
+      alertMsg = createAlert("error", response.data.errors[0].message);
+    }
+  } finally {
+    dispatch(productLoading(false));
+    dispatch(setAlertMessage(alertMsg));
+  }
+};
+
+export const fetchSingleProduct = (
+  productId: string,
+  callback?: () => void
+) => async (
+  dispatch: ThunkDispatch<{}, {}, ProductLoading | FetchSingleProduct>
+) => {
+  try {
+    dispatch(productLoading(true));
+    const product = (await ProductServices.fetchSingleProduct(productId))
+      .data as Product;
+
+    dispatch({
+      type: "FETCH_SINGLE_PRODUCT",
+      payload: { product },
+    });
+
+    if (callback) callback();
+  } catch ({ response }) {
+    printMessage("product.action => readAllProducts()", response);
+    if (response?.data?.errors) {
+      alertMsg = createAlert("error", response.data.errors[0].message);
+    }
+  } finally {
+    dispatch(productLoading(false));
+    dispatch(setAlertMessage(alertMsg));
+  }
+};
+
+export const fetchRelatedProduct = (
+  productId: string,
+  callback?: () => void
+) => async (
+  dispatch: ThunkDispatch<{}, {}, ProductLoading | FetchRelatedProduct>
+) => {
+  try {
+    dispatch(productLoading(true));
+    const products = (await ProductServices.fetchRelatedProducts(productId))
+      .data as Product[];
+
+    dispatch({
+      type: "FETCH_RELATED_PRODUCT",
+      payload: { products },
     });
 
     if (callback) callback();

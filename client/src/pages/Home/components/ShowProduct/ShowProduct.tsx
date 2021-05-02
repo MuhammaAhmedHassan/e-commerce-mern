@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import "./ShowProduct.less";
-import { RouteComponentProps, Link } from "react-router-dom";
+import { RouteChildrenProps, Link } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { Row, Col, Card, Carousel, Image, Typography, Badge, Tabs } from "antd";
 import {
@@ -8,31 +8,27 @@ import {
   ShoppingCartOutlined,
   StarOutlined,
 } from "@ant-design/icons";
-import StarRating from "react-star-ratings";
 import { RatingModal, AverageStarRating } from "../";
 import { RootState } from "../../../../const/types";
 import { SubCategory } from "../../../../const/types/sub-category";
 import { onBoardingRoutes } from "../../../../const/routes";
 import { updateProductRating } from "../../../../redux/actions/product.action";
+import { Product } from "../../../../const/types/product";
 
 const { TabPane } = Tabs;
 
 const { Title } = Typography;
 
-type ParamsType = {
+interface Props {
+  product: Product;
   productCategory: string;
-  productId: string;
-  productSlug: string;
-};
+}
 
-function ShowProduct(props: RouteComponentProps) {
-  const { match, history, location } = props;
-  const { params } = match;
-  let { productCategory, productId, productSlug } = params as ParamsType;
+function ShowProduct(props: RouteChildrenProps & Props) {
+  const { history, location, product, productCategory } = props;
 
   const dispatch = useDispatch();
-  const { product, user } = useSelector(({ product, user }: RootState) => ({
-    product: product.bestSellers[productId] || product.newArrivals[productId],
+  const { user } = useSelector(({ user }: RootState) => ({
     user: user,
   }));
 

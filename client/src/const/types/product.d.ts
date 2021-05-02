@@ -50,6 +50,8 @@ export interface ProductInitialState {
   productsPerPage: { [key: string]: Product };
   newArrivals: { [key: string]: Product };
   bestSellers: { [key: string]: Product };
+  relatedProducts: { [key: string]: Product };
+  singleProduct: Product | null;
   bestSellersPageNumber: number;
   pageNumber: number;
   totalProducts: number;
@@ -130,6 +132,20 @@ export type UpdateProductRating = {
   };
 };
 
+export type FetchSingleProduct = {
+  type: "FETCH_SINGLE_PRODUCT";
+  payload: {
+    product: Product;
+  };
+};
+
+export type FetchRelatedProduct = {
+  type: "FETCH_RELATED_PRODUCT";
+  payload: {
+    products: Product[];
+  };
+};
+
 export type ProductActionTypes =
   | ProductLoading
   | CreateProduct
@@ -140,4 +156,6 @@ export type ProductActionTypes =
   | HomePageProductsNewArrivals
   | DeleteProduct
   | UpdateProduct
-  | UpdateProductRating;
+  | UpdateProductRating
+  | FetchSingleProduct
+  | FetchRelatedProduct;

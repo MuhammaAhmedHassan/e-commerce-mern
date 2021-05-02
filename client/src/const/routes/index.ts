@@ -14,6 +14,8 @@ export const generalRoutes = {
     baseRoutes.HOME + "product/new-arrivals/:productId/:productSlug",
   BEST_SELLERS:
     baseRoutes.HOME + "product/best-sellers/:productId/:productSlug",
+  RELATED_PRODUCTS:
+    baseRoutes.HOME + "product/related-products/:productId/:productSlug",
 };
 
 export const onBoardingRoutes = {

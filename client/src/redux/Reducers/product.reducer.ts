@@ -8,6 +8,8 @@ const initialState: ProductInitialState = {
   productsPerPage: {},
   newArrivals: {},
   bestSellers: {},
+  relatedProducts: {},
+  singleProduct: null,
   bestSellersPageNumber: 0,
   pageNumber: 0,
   totalProducts: 0,
@@ -73,22 +75,41 @@ export default function (state = initialState, action: ProductActionTypes) {
       return { ...state, productsPerPage: { ...state.productsPerPage } };
 
     case "UPDATE_PRODUCT_RATING":
-      if (action.payload.productCategory === "best-sellers")
-        return {
-          ...state,
-          bestSellers: {
-            ...state.bestSellers,
-            [action.payload.product._id]: action.payload.product,
-          },
-        };
-      else
-        return {
-          ...state,
-          newArrivals: {
-            ...state.newArrivals,
-            [action.payload.product._id]: action.payload.product,
-          },
-        };
+      switch (action.payload.productCategory) {
+        case "best-sellers":
+          return {
+            ...state,
+            bestSellers: {
+              ...state.bestSellers,
+              [action.payload.product._id]: action.payload.product,
+            },
+          };
+        case "recent-arrivals":
+          return {
+            ...state,
+            newArrivals: {
+              ...state.newArrivals,
+              [action.payload.product._id]: action.payload.product,
+            },
+          };
+        default:
+          return {
+            ...state,
+            relatedProducts: {
+              ...state.relatedProducts,
+              [action.payload.product._id]: action.payload.product,
+            },
+          };
+      }
+
+    case "FETCH_SINGLE_PRODUCT":
+      return { ...state, singleProduct: action.payload.product };
+
+    case "FETCH_RELATED_PRODUCT":
+      return {
+        ...state,
+        relatedProducts: { ...toObject(action.payload.products) },
+      };
 
     default:
       return state;

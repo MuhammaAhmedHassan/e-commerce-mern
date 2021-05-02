@@ -87,6 +87,43 @@ export const readProducts = async (req: Request, res: Response) => {
   res.json(allProducts);
 };
 
+export const readSingleProduct = async (req: Request, res: Response) => {
+  const id = req.params.id;
+
+  const product = await Product.findById(id)
+    .populate("subCategories")
+    .populate("category")
+    .lean()
+    .exec();
+
+  if (!product) throw new BadRequestError("Product not found");
+
+  res.json(product);
+};
+
+export const readRelatedProducts = async (req: Request, res: Response) => {
+  const productId = req.params.productId;
+
+  if (!productId) throw new BadRequestError("Product id is required");
+
+  const product = await Product.findById(productId).exec();
+
+  if (!product) throw new BadRequestError("Product not found");
+
+  const relatedProducts = await Product.find({
+    _id: { $ne: product._id },
+    category: product.category,
+  })
+    .limit(3)
+    // .populate('postedBy', '-password')
+    .populate("subCategories")
+    .populate("category")
+    .lean()
+    .exec();
+
+  res.json(relatedProducts);
+};
+
 export const deleteProduct = async (req: Request, res: Response) => {
   const _id = req.params.id;
 

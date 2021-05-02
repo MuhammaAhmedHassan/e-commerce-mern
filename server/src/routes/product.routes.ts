@@ -10,6 +10,8 @@ import {
   deleteProduct,
   updateProduct,
   updatedProductRating,
+  readRelatedProducts,
+  readSingleProduct,
 } from "../controllers/product.controller";
 // Validation Arrays
 import {
@@ -37,10 +39,12 @@ router.post(
 
 // Read Products per page
 router.get("/product", readProducts);
-
+// Read Single Product
+router.get("/product/:id", readSingleProduct);
+// Read Related Products
+router.get("/product/related/:productId", readRelatedProducts);
 // Delete product
 router.delete("/product/:id", authCheck, adminCheck, deleteProduct);
-
 // update product
 router.put(
   "/product/:id",
@@ -52,7 +56,6 @@ router.put(
   uploadImages,
   updateProduct
 );
-
 // edit rating
 router.put("/product/star/:productId", authCheck, updatedProductRating);
 
