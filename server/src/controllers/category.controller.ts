@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import { ServerError } from "../errors/server-error";
 import { DatabaseUniqueValueError } from "../errors/database-unique-value-error";
 import { Category } from "../models/category.model";
+import { Product } from "../models/product.model";
 import { DatabaseValidationError } from "../errors/database-validation-error";
 import { BadRequestError } from "../errors/bad-request-error";
 import { slugifyStr } from "../utils/slugifyStr";
@@ -100,4 +101,31 @@ export const deleteCategory = async (req: Request, res: Response) => {
   if (!category) throw new BadRequestError("Category not found");
 
   res.json({ message: "Category deleted successfully" });
+};
+
+export const readRelatedProducts = async (req: Request, res: Response) => {
+  const { categoryId } = req.params;
+  const page = parseInt(req.query.page as string) || 1;
+  const limit = parseInt(req.query.limit as string) || 10;
+  const sort = "createdAt";
+
+  const skip = limit * (page - 1);
+
+  const products = await Product.find({ category: categoryId })
+    .skip(skip)
+    .limit(limit)
+    // .populate('postedBy', '_id name')
+    .sort({ [sort]: -1 })
+    .lean()
+    .exec();
+
+  const totalProducts = await Product.countDocuments({
+    category: categoryId,
+  })
+    .lean()
+    .exec();
+
+  const allProducts = { products: products, total: totalProducts, page };
+
+  res.json(allProducts);
 };

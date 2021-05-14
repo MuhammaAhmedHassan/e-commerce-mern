@@ -182,7 +182,8 @@ export const handleAuthForm = (
       })
     );
 
-    roleBasedRedirect(history, data.role);
+    history.push(generalRoutes.HOME_PAGE);
+    // roleBasedRedirect(history, data.role);
   } catch (error) {
     printMessage("HandleAuthForm.handleAuthForm()", error);
 

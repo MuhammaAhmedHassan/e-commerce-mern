@@ -8,14 +8,9 @@ export const baseRoutes = {
 
 export const generalRoutes = {
   HOME_PAGE: baseRoutes.HOME,
-  PRODUCT_PAGE:
-    baseRoutes.HOME + "product/:productCategory/:productId/:productSlug",
-  NEW_ARRIVALS:
-    baseRoutes.HOME + "product/new-arrivals/:productId/:productSlug",
-  BEST_SELLERS:
-    baseRoutes.HOME + "product/best-sellers/:productId/:productSlug",
-  RELATED_PRODUCTS:
-    baseRoutes.HOME + "product/related-products/:productId/:productSlug",
+  PRODUCT_PAGE: baseRoutes.HOME + "product/:productId/:productSlug",
+  Category: baseRoutes.HOME + "category/:categoryId/:categorySlug",
+  SubCategory: baseRoutes.HOME + "sub-category/:subCategoryId/:subCategorySlug",
 };
 
 export const onBoardingRoutes = {

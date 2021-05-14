@@ -37,4 +37,5 @@ export const productApiRoutes = {
 
   updateRating: "/product/star/${productId}",
   relatedProducts: "/product/related/${productId}",
+  getCategoryProducts: "/category/:categoryId/related-products",
 };

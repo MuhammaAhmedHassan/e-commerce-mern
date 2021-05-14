@@ -17,6 +17,7 @@ import {
   UpdateProductRating,
   FetchSingleProduct,
   FetchRelatedProduct,
+  FetchCategoryProducts,
 } from "../../const/types/product";
 import { ProductServices } from "../../services/product.services";
 import { resizeFile } from "../../utils/fileResizer";
@@ -327,6 +328,39 @@ export const deleteProduct = (product: Product) => async (
     );
   } catch ({ response }) {
     printMessage("product.action => readAllProducts()", response);
+    if (response?.data?.errors) {
+      alertMsg = createAlert("error", response.data.errors[0].message);
+    }
+  } finally {
+    dispatch(productLoading(false));
+    dispatch(setAlertMessage(alertMsg));
+  }
+};
+
+export const getCategoryProducts = (
+  categoryId: string,
+  page: number = 1
+) => async (
+  dispatch: ThunkDispatch<{}, {}, FetchCategoryProducts | ProductLoading>
+) => {
+  const limit = 10;
+  try {
+    dispatch(productLoading(true));
+
+    const data = (
+      await ProductServices.getCategoryProducts({ categoryId, limit, page })
+    ).data as {
+      products: Product[];
+      total: number;
+      page: number;
+    };
+
+    dispatch({
+      type: "FETCH_CATEGORY_PRODUCTS",
+      payload: data,
+    });
+  } catch ({ response }) {
+    printMessage("product.action => getCategoryProducts()", response);
     if (response?.data?.errors) {
       alertMsg = createAlert("error", response.data.errors[0].message);
     }

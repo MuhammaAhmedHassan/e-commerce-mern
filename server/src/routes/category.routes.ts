@@ -11,6 +11,7 @@ import {
   deleteCategory,
   listCategoriesPerPage,
   listAllCategories,
+  readRelatedProducts,
 } from "../controllers/category.controller";
 // Validation Arrays
 import {
@@ -33,8 +34,9 @@ router.post(
 );
 // Read category
 router.get("/category/:slug", readCategory);
+// Read related products
+router.get("/category/:categoryId/related-products", readRelatedProducts);
 // Update category
-
 router.put(
   "/category/:slug",
   authCheck,

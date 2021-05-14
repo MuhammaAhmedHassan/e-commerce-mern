@@ -9,10 +9,12 @@ const initialState: ProductInitialState = {
   newArrivals: {},
   bestSellers: {},
   relatedProducts: {},
+  categoryProducts: {},
   singleProduct: null,
   bestSellersPageNumber: 0,
   pageNumber: 0,
   totalProducts: 0,
+  totalCategoryProducts: 0,
 };
 
 // move this to a utility function
@@ -109,6 +111,13 @@ export default function (state = initialState, action: ProductActionTypes) {
       return {
         ...state,
         relatedProducts: { ...toObject(action.payload.products) },
+      };
+
+    case "FETCH_CATEGORY_PRODUCTS":
+      return {
+        ...state,
+        categoryProducts: toObject(action.payload.products),
+        totalCategoryProduct: action.payload.total,
       };
 
     default:

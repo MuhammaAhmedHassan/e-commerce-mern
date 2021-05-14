@@ -1,16 +1,13 @@
-import { Link } from "react-router-dom";
-import { useDispatch, useSelector } from "react-redux";
-import { Row, Col, Typography, List, Card } from "antd";
-import { EyeOutlined, ShoppingCartOutlined } from "@ant-design/icons";
+import { useSelector } from "react-redux";
+import { Row, Col, Typography, List } from "antd";
 import { RootState } from "../../../../const/types";
-import AverageStarRating from "../AverageStarRating";
+import AverageStarRating from "../../../../shared/components/AverageStarRating";
 import Spinner from "../../../../shared/components/Spinner";
-import { generalRoutes } from "../../../../const/routes";
+import { ProductCard } from "../../../../shared/components/ProductCard/ProductCard";
 
-const { Title, Paragraph } = Typography;
+const { Title } = Typography;
 
 function ShowRecentProducts() {
-  const dispatch = useDispatch();
   const { relatedProducts, loading } = useSelector(
     ({ product }: RootState) => ({
       relatedProducts: product.relatedProducts,
@@ -36,39 +33,7 @@ function ShowRecentProducts() {
                 <Col key={item._id}>
                   <List.Item>
                     <AverageStarRating product={item} />
-                    <Card
-                      className="product-card"
-                      cover={
-                        <img
-                          alt="example"
-                          src={
-                            item.images?.length
-                              ? item.images[0].url
-                              : "https://gw.alipayobjects.com/zos/rmsportal/JiqGstEfoWAOHiTxclqi.png"
-                          }
-                        />
-                      }
-                      actions={[
-                        <Link
-                          to={generalRoutes.RELATED_PRODUCTS.replace(
-                            ":productId",
-                            item._id
-                          ).replace(":productSlug", item.slug)}
-                        >
-                          <EyeOutlined key="eye-outlined" />
-                        </Link>,
-                        <ShoppingCartOutlined key="shopping-cart" />,
-                      ]}
-                    >
-                      <Card.Meta
-                        title={item.title}
-                        description={
-                          <Paragraph ellipsis={true}>
-                            {item.description}
-                          </Paragraph>
-                        }
-                      />
-                    </Card>
+                    <ProductCard product={item} />
                   </List.Item>
                 </Col>
               );

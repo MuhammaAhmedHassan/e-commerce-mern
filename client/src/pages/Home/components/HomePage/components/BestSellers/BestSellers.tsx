@@ -1,19 +1,16 @@
 import { useState, useEffect, memo } from "react";
-import { Link } from "react-router-dom";
-import { List, Row, Col, Typography, Card } from "antd";
-import { EyeOutlined, ShoppingCartOutlined } from "@ant-design/icons";
+import { List, Row, Col, Typography } from "antd";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../../../../../../const/types";
 import { readHomePageProducts } from "../../../../../../redux/actions/product.action";
-import Spinner from "../../../../../../shared/components/Spinner";
-import { generalRoutes } from "../../../../../../const/routes";
-import AverageStarRating from "../../../AverageStarRating";
+import AverageStarRating from "../../../../../../shared/components/AverageStarRating";
+import { ProductCard } from "../../../../../../shared/components/ProductCard/ProductCard";
 
-const { Paragraph, Title } = Typography;
+const { Title } = Typography;
 
 function BestSellers() {
   const dispatch = useDispatch();
-  const { bestSellers, loading, totalProducts, hasMore } = useSelector(
+  const { bestSellers, totalProducts } = useSelector(
     ({ product }: RootState) => ({
       bestSellers: product.bestSellers,
       loading: product.loading,
@@ -69,39 +66,7 @@ function BestSellers() {
                 <Col key={item._id}>
                   <List.Item>
                     <AverageStarRating product={item} />
-                    <Card
-                      className="product-card"
-                      cover={
-                        <img
-                          alt="example"
-                          src={
-                            item.images?.length
-                              ? item.images[0].url
-                              : "https://gw.alipayobjects.com/zos/rmsportal/JiqGstEfoWAOHiTxclqi.png"
-                          }
-                        />
-                      }
-                      actions={[
-                        <Link
-                          to={generalRoutes.BEST_SELLERS.replace(
-                            ":productId",
-                            item._id
-                          ).replace(":productSlug", item.slug)}
-                        >
-                          <EyeOutlined key="eye-outlined" />
-                        </Link>,
-                        <ShoppingCartOutlined key="shopping-cart" />,
-                      ]}
-                    >
-                      <Card.Meta
-                        title={item.title}
-                        description={
-                          <Paragraph ellipsis={true}>
-                            {item.description}
-                          </Paragraph>
-                        }
-                      />
-                    </Card>
+                    <ProductCard product={item} />
                   </List.Item>
                 </Col>
               );

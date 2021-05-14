@@ -116,8 +116,8 @@ export const readRelatedProducts = async (req: Request, res: Response) => {
   })
     .limit(3)
     // .populate('postedBy', '-password')
-    .populate("subCategories")
-    .populate("category")
+    // .populate("subCategories")
+    // .populate("category")
     .lean()
     .exec();
 

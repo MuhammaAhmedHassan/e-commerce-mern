@@ -1,7 +1,11 @@
 import { Switch, Route, RouteComponentProps } from "react-router-dom";
 import { generalRoutes } from "../../const/routes";
 import NotFound from "../../shared/components/404NotFound";
-import { HomePage, ShowSingleProduct } from "./components";
+import {
+  HomePage,
+  ShowSingleProduct,
+  ShowCategoryProducts,
+} from "./components";
 
 function HomeRouter(_: RouteComponentProps) {
   return (
@@ -11,6 +15,11 @@ function HomeRouter(_: RouteComponentProps) {
         exact
         path={generalRoutes.PRODUCT_PAGE}
         component={ShowSingleProduct}
+      />
+      <Route
+        exact
+        path={generalRoutes.Category}
+        component={ShowCategoryProducts}
       />
       <Route component={NotFound} />
     </Switch>

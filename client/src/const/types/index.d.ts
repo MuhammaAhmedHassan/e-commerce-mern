@@ -1,5 +1,5 @@
 import { AnyAction } from "redux";
-import { ProductInitialState } from "./product";
+import { ProductInitialState, Product } from "./product";
 import { SubCategoryInitialState } from "./sub-category";
 
 interface RootState {

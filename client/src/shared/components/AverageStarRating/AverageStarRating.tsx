@@ -1,6 +1,6 @@
 import { memo } from "react";
 import StarRating from "react-star-ratings";
-import { Product } from "../../../../const/types/product";
+import { Product } from "../../../const/types/product";
 import { Typography, Row } from "antd";
 
 const { Paragraph } = Typography;
