@@ -5,6 +5,7 @@ import {
   HomePage,
   ShowSingleProduct,
   ShowCategoryProducts,
+  ShowSubCategoryProducts,
 } from "./components";
 
 function HomeRouter(_: RouteComponentProps) {
@@ -20,6 +21,12 @@ function HomeRouter(_: RouteComponentProps) {
         exact
         path={generalRoutes.Category}
         component={ShowCategoryProducts}
+      />
+
+      <Route
+        exact
+        path={generalRoutes.SubCategory}
+        component={ShowSubCategoryProducts}
       />
       <Route component={NotFound} />
     </Switch>

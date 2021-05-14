@@ -5,3 +5,4 @@ export { default as AverageStarRating } from "../../../shared/components/Average
 export { default as ShowSingleProduct } from "./ShowSingleProduct";
 export { default as ShowRecentProducts } from "./ShowRecentProducts";
 export * from "./ShowCategoryProducts/ShowCategoryProducts";
+export * from "./ShowSubCategoryProducts/ShowSubCategoryProducts";

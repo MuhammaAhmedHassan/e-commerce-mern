@@ -27,7 +27,6 @@ export function ShowCategoryProducts(props: RouteComponentProps) {
   const [cateogoryProductsLimit] = useState(10);
 
   useEffect(() => {
-    console.log("object");
     dispatch(getCategoryProducts(categoryId));
   }, []);
 
