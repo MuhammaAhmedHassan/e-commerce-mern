@@ -1,10 +1,11 @@
 import { Request, Response } from "express";
+import { LeanDocument } from "mongoose";
+import slugify from "slugify";
+
 import { Product, ProductDoc } from "../models/product.model";
 import { User } from "../models/user.model";
-import slugify from "slugify";
 import { BadRequestError } from "../errors/bad-request-error";
 import { removeImagesUtilFunc } from "../utils/cloudinary.utils";
-import { LeanDocument } from "mongoose";
 
 export const createProduct = async (req: Request, res: Response) => {
   console.log("product.controller.ts => createProduct()", req.body);

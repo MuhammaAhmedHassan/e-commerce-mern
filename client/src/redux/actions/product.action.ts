@@ -18,6 +18,7 @@ import {
   FetchSingleProduct,
   FetchRelatedProduct,
   FetchCategoryProducts,
+  FetchSubCategoryProducts,
 } from "../../const/types/product";
 import { ProductServices } from "../../services/product.services";
 import { resizeFile } from "../../utils/fileResizer";
@@ -47,328 +48,366 @@ export const productLoading = (loading: boolean): ProductLoading => ({
   payload: { loading },
 });
 
-export const createProduct = (
-  newProduct: ProductFormValues,
-  callback?: () => void
-) => async (
-  dispatch: ThunkDispatch<{}, {}, CreateProduct | ProductLoading>
-) => {
-  try {
-    dispatch(productLoading(true));
+export const createProduct =
+  (newProduct: ProductFormValues, callback?: () => void) =>
+  async (dispatch: ThunkDispatch<{}, {}, CreateProduct | ProductLoading>) => {
+    try {
+      dispatch(productLoading(true));
 
-    const images = (newProduct.images as unknown) as {
-      originFileObj: File;
-    }[];
+      const images = newProduct.images as unknown as {
+        originFileObj: File;
+      }[];
 
-    // // array to store resized images
-    // const imgs: string[] = [];
+      // // array to store resized images
+      // const imgs: string[] = [];
 
-    // // resizing and converting images to base64
-    // for (let i = 0; i < images.length; i++) {
-    //   const img = (await resizeFile(images[i].originFileObj)) as string;
-    //   imgs.push(img);
-    // }
+      // // resizing and converting images to base64
+      // for (let i = 0; i < images.length; i++) {
+      //   const img = (await resizeFile(images[i].originFileObj)) as string;
+      //   imgs.push(img);
+      // }
 
-    // newProduct.images = imgs;
-    newProduct.images = await resizeImages(images);
+      // newProduct.images = imgs;
+      newProduct.images = await resizeImages(images);
 
-    const product = (await ProductServices.createProduct(newProduct))
-      .data as Product;
+      const product = (await ProductServices.createProduct(newProduct))
+        .data as Product;
 
-    dispatch({ type: "CREATE_PRODUCT", payload: { product } });
-    alertMsg = createAlert(
-      "success",
-      `Product ${product.title} created successfully.`
-    );
+      dispatch({ type: "CREATE_PRODUCT", payload: { product } });
+      alertMsg = createAlert(
+        "success",
+        `Product ${product.title} created successfully.`
+      );
 
-    if (callback) callback();
-  } catch ({ response }) {
-    printMessage("product.action => createProduct()", response);
-    if (response?.data?.errors) {
-      alertMsg = createAlert("error", response.data.errors[0].message);
+      if (callback) callback();
+    } catch ({ response }) {
+      printMessage("product.action => createProduct()", response);
+      if (response?.data?.errors) {
+        alertMsg = createAlert("error", response.data.errors[0].message);
+      }
+    } finally {
+      dispatch(productLoading(false));
+      dispatch(setAlertMessage(alertMsg));
     }
-  } finally {
-    dispatch(productLoading(false));
-    dispatch(setAlertMessage(alertMsg));
-  }
-};
+  };
 
-export const readAllProducts = () => async (
-  dispatch: ThunkDispatch<{}, {}, ReadAllProducts | ProductLoading>
-) => {
-  try {
-    dispatch(productLoading(true));
-    const products = (await ProductServices.readAllProducts())
-      .data as Product[];
+export const readAllProducts =
+  () =>
+  async (dispatch: ThunkDispatch<{}, {}, ReadAllProducts | ProductLoading>) => {
+    try {
+      dispatch(productLoading(true));
+      const products = (await ProductServices.readAllProducts())
+        .data as Product[];
 
-    dispatch({ type: "READ_ALL_PRODUCTS", payload: { products } });
-  } catch ({ response }) {
-    printMessage("product.action => readAllProducts()", response);
-    if (response?.data?.errors) {
-      alertMsg = createAlert("error", response.data.errors[0].message);
+      dispatch({ type: "READ_ALL_PRODUCTS", payload: { products } });
+    } catch ({ response }) {
+      printMessage("product.action => readAllProducts()", response);
+      if (response?.data?.errors) {
+        alertMsg = createAlert("error", response.data.errors[0].message);
+      }
+    } finally {
+      dispatch(productLoading(false));
+      dispatch(setAlertMessage(alertMsg));
     }
-  } finally {
-    dispatch(productLoading(false));
-    dispatch(setAlertMessage(alertMsg));
-  }
-};
+  };
 
-export const readProductsPerPage = (page: number = 1) => async (
-  dispatch: ThunkDispatch<{}, {}, ReadProductsPerPage | ProductLoading>
-) => {
-  try {
-    dispatch(productLoading(true));
-    const { data, page: pageNumber, total } = (
-      await ProductServices.readProductsPerPage(page)
-    ).data as {
-      data: Product[];
-      total: number;
-      page: number;
-    };
+export const readProductsPerPage =
+  (page: number = 1) =>
+  async (
+    dispatch: ThunkDispatch<{}, {}, ReadProductsPerPage | ProductLoading>
+  ) => {
+    try {
+      dispatch(productLoading(true));
+      const {
+        data,
+        page: pageNumber,
+        total,
+      } = (await ProductServices.readProductsPerPage(page)).data as {
+        data: Product[];
+        total: number;
+        page: number;
+      };
 
-    dispatch({
-      type: "READ_PRODUCTS_PER_PAGE",
-      payload: { products: data, page: pageNumber, total },
-    });
-  } catch ({ response }) {
-    printMessage("product.action => readAllProducts()", response);
-    if (response?.data?.errors) {
-      alertMsg = createAlert("error", response.data.errors[0].message);
-    }
-  } finally {
-    dispatch(productLoading(false));
-    dispatch(setAlertMessage(alertMsg));
-  }
-};
-
-export const readHomePageProducts = (
-  options: { page: number; limit: number; sort: "createdAt" | "sold" },
-  callback?: () => void
-) => async (
-  dispatch: ThunkDispatch<
-    {},
-    {},
-    HomePageProductsNewArrivals | HomePageProductsBestSellers | ProductLoading
-  >
-) => {
-  try {
-    dispatch(productLoading(true));
-    const { data, page: pageNumber, total } = (
-      await ProductServices.readHomePageProducts(options)
-    ).data as {
-      data: Product[];
-      total: number;
-      page: number;
-    };
-
-    if (options.sort === "sold") {
       dispatch({
-        type: "READ_BEST_SELLERS_PER_PAGE",
+        type: "READ_PRODUCTS_PER_PAGE",
         payload: { products: data, page: pageNumber, total },
       });
-    } else {
+    } catch ({ response }) {
+      printMessage("product.action => readAllProducts()", response);
+      if (response?.data?.errors) {
+        alertMsg = createAlert("error", response.data.errors[0].message);
+      }
+    } finally {
+      dispatch(productLoading(false));
+      dispatch(setAlertMessage(alertMsg));
+    }
+  };
+
+export const readHomePageProducts =
+  (
+    options: { page: number; limit: number; sort: "createdAt" | "sold" },
+    callback?: () => void
+  ) =>
+  async (
+    dispatch: ThunkDispatch<
+      {},
+      {},
+      HomePageProductsNewArrivals | HomePageProductsBestSellers | ProductLoading
+    >
+  ) => {
+    try {
+      dispatch(productLoading(true));
+      const {
+        data,
+        page: pageNumber,
+        total,
+      } = (await ProductServices.readHomePageProducts(options)).data as {
+        data: Product[];
+        total: number;
+        page: number;
+      };
+
+      if (options.sort === "sold") {
+        dispatch({
+          type: "READ_BEST_SELLERS_PER_PAGE",
+          payload: { products: data, page: pageNumber, total },
+        });
+      } else {
+        dispatch({
+          type: "READ_NEW_ARRIVALS_PER_PAGE",
+          payload: { products: data, page: pageNumber, total },
+        });
+      }
+
+      if (callback) callback();
+    } catch ({ response }) {
+      printMessage("product.action => readAllProducts()", response);
+      if (response?.data?.errors) {
+        alertMsg = createAlert("error", response.data.errors[0].message);
+      }
+    } finally {
+      dispatch(productLoading(false));
+      dispatch(setAlertMessage(alertMsg));
+    }
+  };
+
+export const updateProductRating =
+  (
+    options: {
+      star: number;
+      productId: string;
+      productCategory: string;
+    },
+    callback?: () => void
+  ) =>
+  async (
+    dispatch: ThunkDispatch<{}, {}, ProductLoading | UpdateProductRating>
+  ) => {
+    const { productCategory, ...rest } = options;
+    try {
+      dispatch(productLoading(true));
+      const product = (await ProductServices.updateProductRating(rest))
+        .data as Product;
+
       dispatch({
-        type: "READ_NEW_ARRIVALS_PER_PAGE",
-        payload: { products: data, page: pageNumber, total },
+        type: "UPDATE_PRODUCT_RATING",
+        payload: { product, productCategory },
       });
+
+      if (callback) callback();
+    } catch ({ response }) {
+      printMessage("product.action => readAllProducts()", response);
+      if (response?.data?.errors) {
+        alertMsg = createAlert("error", response.data.errors[0].message);
+      }
+    } finally {
+      dispatch(productLoading(false));
+      dispatch(setAlertMessage(alertMsg));
     }
+  };
 
-    if (callback) callback();
-  } catch ({ response }) {
-    printMessage("product.action => readAllProducts()", response);
-    if (response?.data?.errors) {
-      alertMsg = createAlert("error", response.data.errors[0].message);
+export const fetchSingleProduct =
+  (productId: string, callback?: () => void) =>
+  async (
+    dispatch: ThunkDispatch<{}, {}, ProductLoading | FetchSingleProduct>
+  ) => {
+    try {
+      dispatch(productLoading(true));
+      const product = (await ProductServices.fetchSingleProduct(productId))
+        .data as Product;
+
+      dispatch({
+        type: "FETCH_SINGLE_PRODUCT",
+        payload: { product },
+      });
+
+      if (callback) callback();
+    } catch ({ response }) {
+      printMessage("product.action => readAllProducts()", response);
+      if (response?.data?.errors) {
+        alertMsg = createAlert("error", response.data.errors[0].message);
+      }
+    } finally {
+      dispatch(productLoading(false));
+      dispatch(setAlertMessage(alertMsg));
     }
-  } finally {
-    dispatch(productLoading(false));
-    dispatch(setAlertMessage(alertMsg));
-  }
-};
+  };
 
-export const updateProductRating = (
-  options: {
-    star: number;
-    productId: string;
-    productCategory: string;
-  },
-  callback?: () => void
-) => async (
-  dispatch: ThunkDispatch<{}, {}, ProductLoading | UpdateProductRating>
-) => {
-  const { productCategory, ...rest } = options;
-  try {
-    dispatch(productLoading(true));
-    const product = (await ProductServices.updateProductRating(rest))
-      .data as Product;
+export const fetchRelatedProduct =
+  (productId: string, callback?: () => void) =>
+  async (
+    dispatch: ThunkDispatch<{}, {}, ProductLoading | FetchRelatedProduct>
+  ) => {
+    try {
+      dispatch(productLoading(true));
+      const products = (await ProductServices.fetchRelatedProducts(productId))
+        .data as Product[];
 
-    dispatch({
-      type: "UPDATE_PRODUCT_RATING",
-      payload: { product, productCategory },
-    });
+      dispatch({
+        type: "FETCH_RELATED_PRODUCT",
+        payload: { products },
+      });
 
-    if (callback) callback();
-  } catch ({ response }) {
-    printMessage("product.action => readAllProducts()", response);
-    if (response?.data?.errors) {
-      alertMsg = createAlert("error", response.data.errors[0].message);
+      if (callback) callback();
+    } catch ({ response }) {
+      printMessage("product.action => readAllProducts()", response);
+      if (response?.data?.errors) {
+        alertMsg = createAlert("error", response.data.errors[0].message);
+      }
+    } finally {
+      dispatch(productLoading(false));
+      dispatch(setAlertMessage(alertMsg));
     }
-  } finally {
-    dispatch(productLoading(false));
-    dispatch(setAlertMessage(alertMsg));
-  }
-};
+  };
 
-export const fetchSingleProduct = (
-  productId: string,
-  callback?: () => void
-) => async (
-  dispatch: ThunkDispatch<{}, {}, ProductLoading | FetchSingleProduct>
-) => {
-  try {
-    dispatch(productLoading(true));
-    const product = (await ProductServices.fetchSingleProduct(productId))
-      .data as Product;
+export const updateProduct =
+  (productToUpdate: Product, newValues: ProductFormValues) =>
+  async (dispatch: ThunkDispatch<{}, {}, UpdateProduct | ProductLoading>) => {
+    try {
+      dispatch(productLoading(true));
 
-    dispatch({
-      type: "FETCH_SINGLE_PRODUCT",
-      payload: { product },
-    });
+      const {
+        newImages,
+        removedImages,
+        oldImages: _,
+      } = reduceImages(productToUpdate, newValues);
+      newValues = getProductUpdatedFields(productToUpdate, newValues);
+      newValues.images = await resizeImages(newImages);
+      newValues.removedImages = removedImages || [];
 
-    if (callback) callback();
-  } catch ({ response }) {
-    printMessage("product.action => readAllProducts()", response);
-    if (response?.data?.errors) {
-      alertMsg = createAlert("error", response.data.errors[0].message);
+      const product = (
+        await ProductServices.updateProduct(newValues, productToUpdate._id)
+      ).data as Product;
+
+      dispatch({ type: "UPDATE_PRODUCT", payload: { product } });
+      alertMsg = createAlert(
+        "success",
+        `Product ${product.title} updated successfully.`
+      );
+    } catch (error) {
+      const { response } = error;
+      printMessage("product.action => readAllProducts()", error);
+      if (response?.data?.errors) {
+        alertMsg = createAlert("error", response.data.errors[0].message);
+      } else {
+        throw new Error(error);
+      }
+    } finally {
+      dispatch(productLoading(false));
+      dispatch(setAlertMessage(alertMsg));
     }
-  } finally {
-    dispatch(productLoading(false));
-    dispatch(setAlertMessage(alertMsg));
-  }
-};
+  };
 
-export const fetchRelatedProduct = (
-  productId: string,
-  callback?: () => void
-) => async (
-  dispatch: ThunkDispatch<{}, {}, ProductLoading | FetchRelatedProduct>
-) => {
-  try {
-    dispatch(productLoading(true));
-    const products = (await ProductServices.fetchRelatedProducts(productId))
-      .data as Product[];
+export const deleteProduct =
+  (product: Product) =>
+  async (dispatch: ThunkDispatch<{}, {}, DeleteProduct | ProductLoading>) => {
+    try {
+      dispatch(productLoading(true));
+      await ProductServices.deleteProduct(product._id);
 
-    dispatch({
-      type: "FETCH_RELATED_PRODUCT",
-      payload: { products },
-    });
-
-    if (callback) callback();
-  } catch ({ response }) {
-    printMessage("product.action => readAllProducts()", response);
-    if (response?.data?.errors) {
-      alertMsg = createAlert("error", response.data.errors[0].message);
+      dispatch({ type: "DELETE_PRODUCT", payload: { productId: product._id } });
+      alertMsg = createAlert(
+        "success",
+        `Product ${product.title} deleted successfully.`
+      );
+    } catch ({ response }) {
+      printMessage("product.action => readAllProducts()", response);
+      if (response?.data?.errors) {
+        alertMsg = createAlert("error", response.data.errors[0].message);
+      }
+    } finally {
+      dispatch(productLoading(false));
+      dispatch(setAlertMessage(alertMsg));
     }
-  } finally {
-    dispatch(productLoading(false));
-    dispatch(setAlertMessage(alertMsg));
-  }
-};
+  };
 
-export const updateProduct = (
-  productToUpdate: Product,
-  newValues: ProductFormValues
-) => async (
-  dispatch: ThunkDispatch<{}, {}, UpdateProduct | ProductLoading>
-) => {
-  try {
-    dispatch(productLoading(true));
+export const getCategoryProducts =
+  (categoryId: string, page: number = 1) =>
+  async (
+    dispatch: ThunkDispatch<{}, {}, FetchCategoryProducts | ProductLoading>
+  ) => {
+    const limit = 10;
+    try {
+      dispatch(productLoading(true));
 
-    const { newImages, removedImages, oldImages: _ } = reduceImages(
-      productToUpdate,
-      newValues
-    );
-    newValues = getProductUpdatedFields(productToUpdate, newValues);
-    newValues.images = await resizeImages(newImages);
-    newValues.removedImages = removedImages || [];
+      const data = (
+        await ProductServices.getCategoryProducts({ categoryId, limit, page })
+      ).data as {
+        products: Product[];
+        total: number;
+        page: number;
+      };
 
-    const product = (
-      await ProductServices.updateProduct(newValues, productToUpdate._id)
-    ).data as Product;
-
-    dispatch({ type: "UPDATE_PRODUCT", payload: { product } });
-    alertMsg = createAlert(
-      "success",
-      `Product ${product.title} updated successfully.`
-    );
-  } catch (error) {
-    const { response } = error;
-    printMessage("product.action => readAllProducts()", error);
-    if (response?.data?.errors) {
-      alertMsg = createAlert("error", response.data.errors[0].message);
-    } else {
-      throw new Error(error);
+      dispatch({
+        type: "FETCH_CATEGORY_PRODUCTS",
+        payload: data,
+      });
+    } catch ({ response }) {
+      printMessage("product.action => getCategoryProducts()", response);
+      if (response?.data?.errors) {
+        alertMsg = createAlert("error", response.data.errors[0].message);
+      }
+    } finally {
+      dispatch(productLoading(false));
+      dispatch(setAlertMessage(alertMsg));
     }
-  } finally {
-    dispatch(productLoading(false));
-    dispatch(setAlertMessage(alertMsg));
-  }
-};
+  };
 
-export const deleteProduct = (product: Product) => async (
-  dispatch: ThunkDispatch<{}, {}, DeleteProduct | ProductLoading>
-) => {
-  try {
-    dispatch(productLoading(true));
-    await ProductServices.deleteProduct(product._id);
+export const getSubCategoryProducts =
+  (subCategoryId: string, page: number = 1) =>
+  async (
+    dispatch: ThunkDispatch<{}, {}, FetchSubCategoryProducts | ProductLoading>
+  ) => {
+    const limit = 10;
+    try {
+      dispatch(productLoading(true));
 
-    dispatch({ type: "DELETE_PRODUCT", payload: { productId: product._id } });
-    alertMsg = createAlert(
-      "success",
-      `Product ${product.title} deleted successfully.`
-    );
-  } catch ({ response }) {
-    printMessage("product.action => readAllProducts()", response);
-    if (response?.data?.errors) {
-      alertMsg = createAlert("error", response.data.errors[0].message);
+      const data = (
+        await ProductServices.getSubCategoryProducts({
+          subCategoryId,
+          limit,
+          page,
+        })
+      ).data as {
+        products: Product[];
+        total: number;
+        page: number;
+      };
+
+      dispatch({
+        type: "FETCH_SUB_CATEGORY_PRODUCTS",
+        payload: data,
+      });
+    } catch ({ response }) {
+      printMessage("product.action => getSubCategoryProducts()", response);
+      if (response?.data?.errors) {
+        alertMsg = createAlert("error", response.data.errors[0].message);
+      }
+    } finally {
+      dispatch(productLoading(false));
+      dispatch(setAlertMessage(alertMsg));
     }
-  } finally {
-    dispatch(productLoading(false));
-    dispatch(setAlertMessage(alertMsg));
-  }
-};
-
-export const getCategoryProducts = (
-  categoryId: string,
-  page: number = 1
-) => async (
-  dispatch: ThunkDispatch<{}, {}, FetchCategoryProducts | ProductLoading>
-) => {
-  const limit = 10;
-  try {
-    dispatch(productLoading(true));
-
-    const data = (
-      await ProductServices.getCategoryProducts({ categoryId, limit, page })
-    ).data as {
-      products: Product[];
-      total: number;
-      page: number;
-    };
-
-    dispatch({
-      type: "FETCH_CATEGORY_PRODUCTS",
-      payload: data,
-    });
-  } catch ({ response }) {
-    printMessage("product.action => getCategoryProducts()", response);
-    if (response?.data?.errors) {
-      alertMsg = createAlert("error", response.data.errors[0].message);
-    }
-  } finally {
-    dispatch(productLoading(false));
-    dispatch(setAlertMessage(alertMsg));
-  }
-};
+  };
 
 const reduceImages = (
   productToUpdate: Product,
@@ -378,18 +417,22 @@ const reduceImages = (
     (i) => i.originFileObj
   );
 
-  const oldImages = (newValues.images as {
-    name: string;
-    uid: string;
-    url: string;
-  }[]).filter((i) => i.name && i.uid && i.url);
-
-  const removedImages = productToUpdate.images.reduce((prv, cur) => {
-    const img = (newValues.images as {
+  const oldImages = (
+    newValues.images as {
+      name: string;
       uid: string;
       url: string;
-      name: string;
-    }[]).find((i) => i.uid === cur.imageId);
+    }[]
+  ).filter((i) => i.name && i.uid && i.url);
+
+  const removedImages = productToUpdate.images.reduce((prv, cur) => {
+    const img = (
+      newValues.images as {
+        uid: string;
+        url: string;
+        name: string;
+      }[]
+    ).find((i) => i.uid === cur.imageId);
     if (!img) prv.push(cur.imageId);
     return prv;
   }, [] as string[]);

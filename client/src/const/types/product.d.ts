@@ -52,11 +52,13 @@ export interface ProductInitialState {
   bestSellers: { [key: string]: Product };
   relatedProducts: { [key: string]: Product };
   categoryProducts: { [key: string]: Product };
+  subCategoryProducts: { [key: string]: Product };
   singleProduct: Product | null;
   bestSellersPageNumber: number;
   pageNumber: number;
   totalProducts: number;
   totalCategoryProducts: number;
+  totalSubCategoryProducts: number;
 }
 
 export type ProductLoading = {
@@ -157,6 +159,15 @@ export type FetchCategoryProducts = {
   };
 };
 
+export type FetchSubCategoryProducts = {
+  type: "FETCH_SUB_CATEGORY_PRODUCTS";
+  payload: {
+    products: Product[];
+    total: number;
+    page: number;
+  };
+};
+
 export type ProductActionTypes =
   | ProductLoading
   | CreateProduct
@@ -170,4 +181,5 @@ export type ProductActionTypes =
   | UpdateProductRating
   | FetchSingleProduct
   | FetchRelatedProduct
-  | FetchCategoryProducts;
+  | FetchCategoryProducts
+  | FetchSubCategoryProducts;

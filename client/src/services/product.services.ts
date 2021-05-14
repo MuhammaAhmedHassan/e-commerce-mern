@@ -18,6 +18,7 @@ const {
   updateRating,
   relatedProducts,
   getCategoryProducts,
+  getSubCategoryProducts,
 } = productApiRoutes;
 
 export class ProductServices {
@@ -80,6 +81,16 @@ export class ProductServices {
   }) {
     const { categoryId, page, limit } = options;
     const url = getCategoryProducts.replace(":categoryId", categoryId);
+    return HTTP(url + `?page=${page}&limit=${limit}`);
+  }
+
+  static async getSubCategoryProducts(options: {
+    subCategoryId: string;
+    page: number;
+    limit: number;
+  }) {
+    const { subCategoryId, page, limit } = options;
+    const url = getSubCategoryProducts.replace(":subCategoryId", subCategoryId);
     return HTTP(url + `?page=${page}&limit=${limit}`);
   }
 }

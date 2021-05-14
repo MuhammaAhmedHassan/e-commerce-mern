@@ -3,6 +3,12 @@ import { Router } from "express";
 import { authCheck } from "../middlewares/auth.middlewares";
 import { adminCheck } from "../middlewares/adminCheck.middlewares";
 import { validateRequest } from "../middlewares/validateRequest.middlewares";
+// Validation Arrays
+import {
+  createOrUpdateSubCatValArr,
+  catParamCheckArr,
+  subCatParamCheckArr,
+} from "../const/sub-category-val-arr";
 // Controllers
 import {
   createSubCategory,
@@ -11,18 +17,17 @@ import {
   deleteSubCategory,
   listSubCategoriesPerPage,
   listAllSubCategories,
+  readRelatedProducts,
 } from "../controllers/sub-category.controller";
-// Validation Arrays
-import {
-  createOrUpdateSubCatValArr,
-  catParamCheckArr,
-  subCatParamCheckArr,
-} from "../const/sub-category-val-arr";
 
 export const router = Router();
 
 router.get("/all-sub-categories", listAllSubCategories); // public route
-
+// Read related products
+router.get(
+  "/sub-category/:subCategoryId/related-products",
+  readRelatedProducts
+);
 // Create category
 router.post(
   "/category/:parentCategory/sub-category",
