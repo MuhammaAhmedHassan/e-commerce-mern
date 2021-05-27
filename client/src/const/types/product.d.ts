@@ -53,12 +53,15 @@ export interface ProductInitialState {
   relatedProducts: { [key: string]: Product };
   categoryProducts: { [key: string]: Product };
   subCategoryProducts: { [key: string]: Product };
+  shopPage: { [key: string]: Product };
   singleProduct: Product | null;
   bestSellersPageNumber: number;
   pageNumber: number;
+  shopPageProductsPageNumber: number;
   totalProducts: number;
   totalCategoryProducts: number;
   totalSubCategoryProducts: number;
+  totalShopPageProducts: number;
 }
 
 export type ProductLoading = {
@@ -107,6 +110,24 @@ export type HomePageProductsNewArrivals = {
 
 export type HomePageProductsBestSellers = {
   type: "READ_BEST_SELLERS_PER_PAGE";
+  payload: {
+    products: Product[];
+    total: number;
+    page: number;
+  };
+};
+
+export type ShopPagePaginatedProducts = {
+  type: "SHOP_PAGE_PAGINATED_PRODUCTS";
+  payload: {
+    products: Product[];
+    total: number;
+    page: number;
+  };
+};
+
+export type ShopPageFilteredPaginatedProducts = {
+  type: "SHOP_PAGE_FILTERED_PAGINATED_PRODUCTS";
   payload: {
     products: Product[];
     total: number;
@@ -182,4 +203,6 @@ export type ProductActionTypes =
   | FetchSingleProduct
   | FetchRelatedProduct
   | FetchCategoryProducts
-  | FetchSubCategoryProducts;
+  | FetchSubCategoryProducts
+  | ShopPagePaginatedProducts
+  | ShopPageFilteredPaginatedProducts;

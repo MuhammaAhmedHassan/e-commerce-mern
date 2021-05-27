@@ -6,6 +6,10 @@ import { Product, ProductDoc } from "../models/product.model";
 import { User } from "../models/user.model";
 import { BadRequestError } from "../errors/bad-request-error";
 import { removeImagesUtilFunc } from "../utils/cloudinary.utils";
+import {
+  getPaginatedProducts,
+  getProductsBasedOnTextQuery,
+} from "../services/product.services";
 
 export const createProduct = async (req: Request, res: Response) => {
   console.log("product.controller.ts => createProduct()", req.body);
@@ -123,6 +127,40 @@ export const readRelatedProducts = async (req: Request, res: Response) => {
     .exec();
 
   res.json(relatedProducts);
+};
+
+export const filteredProducts = async (req: Request, res: Response) => {
+  const keywords = req.body.query;
+  const { page, limit, min, max, categoriesIds, rating, subCategoriesIds } =
+    req.body;
+  const skip = limit * (page - 1);
+
+  const query: any = {};
+
+  if (keywords) query.$text = { $search: keywords };
+  if (min || max)
+    query.price = { $gte: min ?? 1, $lte: max ?? Number.MAX_SAFE_INTEGER };
+  // Maybe we'll have array of categories
+  if (categoriesIds) query.category = { $in: categoriesIds };
+  if (subCategoriesIds) query.subCategories = { $in: subCategoriesIds };
+  if (rating) query.rating = rating;
+
+  const products: LeanDocument<ProductDoc>[] = await Product.find(query)
+    // .populate("category", "_id name")
+    // .populate("subcategories", "_id name")
+    // .populate("postedBy", "_id name")
+    .skip(skip)
+    .limit(limit)
+    .sort({ createdAt: -1 })
+    .lean()
+    .exec();
+
+  // const totalProducts = await Product.find({ $text: { $search: keywords } })
+  const totalProducts = await Product.find(query).count().lean().exec();
+
+  const allProducts = { data: products, total: totalProducts, page };
+
+  res.json(allProducts);
 };
 
 export const deleteProduct = async (req: Request, res: Response) => {

@@ -4,6 +4,7 @@ export const baseRoutes = {
   HOME: "/",
   ADMIN: "/admin",
   USER: "/user",
+  SHOP: "/shop",
 };
 
 export const generalRoutes = {

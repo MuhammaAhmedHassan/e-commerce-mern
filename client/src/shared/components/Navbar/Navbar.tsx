@@ -8,6 +8,8 @@ import {
   UserOutlined,
   UserAddOutlined,
   LogoutOutlined,
+  ShopOutlined,
+  ShoppingOutlined,
 } from "@ant-design/icons";
 import { useLocation } from "react-router-dom";
 import { MenuInfo } from "rc-menu/lib/interface";
@@ -20,6 +22,7 @@ import {
 import { RootState } from "../../../const/types";
 import { logoutUser } from "../../../redux/actions/user.action";
 import { AppLocalStorage } from "../../../utils/AppLocalStorage";
+import { SearchForm } from "./SearchForm";
 
 const { SubMenu, Item } = Menu;
 
@@ -48,6 +51,9 @@ function Navbar() {
     <Menu onClick={handleClick} selectedKeys={[current]} mode="horizontal">
       <Item key="home" icon={<AppstoreAddOutlined />}>
         <Link to="/">Home</Link>
+      </Item>
+      <Item key="shop" icon={<ShoppingOutlined />}>
+        <Link to="/shop">Shop</Link>
       </Item>
 
       {!getToken() ? (
@@ -88,6 +94,9 @@ function Navbar() {
           </Item>
         </SubMenu>
       )}
+      <Item key="search-form" className="search-form-container">
+        <SearchForm />
+      </Item>
     </Menu>
   );
 }

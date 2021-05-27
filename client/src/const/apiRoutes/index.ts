@@ -39,4 +39,6 @@ export const productApiRoutes = {
   relatedProducts: "/product/related/${productId}",
   getCategoryProducts: "/category/:categoryId/related-products",
   getSubCategoryProducts: "/sub-category/:subCategoryId/related-products",
+
+  filteredProductsPerPage: "/product/search",
 };

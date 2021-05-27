@@ -66,7 +66,7 @@ const productSchema = new mongoose.Schema(
       type: String,
       required: true,
       maxlength: 2000,
-      text: true,
+      text: true, // for searching purpose
     },
     price: {
       type: Number,

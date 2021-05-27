@@ -12,6 +12,7 @@ import {
   updatedProductRating,
   readRelatedProducts,
   readSingleProduct,
+  filteredProducts,
 } from "../controllers/product.controller";
 // Validation Arrays
 import {
@@ -43,6 +44,8 @@ router.get("/product", readProducts);
 router.get("/product/:id", readSingleProduct);
 // Read Related Products
 router.get("/product/related/:productId", readRelatedProducts);
+// Read product based on filters
+router.post("/product/search", filteredProducts);
 // Delete product
 router.delete("/product/:id", authCheck, adminCheck, deleteProduct);
 // update product

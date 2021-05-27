@@ -49,4 +49,4 @@ To learn React, check out the [React documentation](https://reactjs.org/).
 // "build": "react-scripts build",
 // "test": "react-scripts test",
 
-12. -> 8.
+15. -> 10.

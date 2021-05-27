@@ -1,6 +1,6 @@
 import { ThunkDispatch } from "redux-thunk";
 import { printMessage } from "../../const/printMessage";
-import { AlertReduxState, CategoryType } from "../../const/types";
+import { AlertReduxState } from "../../const/types";
 import {
   CreateProduct,
   DeleteProduct,
@@ -10,15 +10,15 @@ import {
   ProductFormValues,
   ProductLoading,
   ReadAllProducts,
-  ReadProduct,
   ReadProductsPerPage,
-  ResponseImageType,
   UpdateProduct,
   UpdateProductRating,
   FetchSingleProduct,
   FetchRelatedProduct,
   FetchCategoryProducts,
   FetchSubCategoryProducts,
+  ShopPagePaginatedProducts,
+  ShopPageFilteredPaginatedProducts,
 } from "../../const/types/product";
 import { ProductServices } from "../../services/product.services";
 import { resizeFile } from "../../utils/fileResizer";
@@ -178,6 +178,94 @@ export const readHomePageProducts =
           payload: { products: data, page: pageNumber, total },
         });
       }
+
+      if (callback) callback();
+    } catch ({ response }) {
+      printMessage("product.action => readAllProducts()", response);
+      if (response?.data?.errors) {
+        alertMsg = createAlert("error", response.data.errors[0].message);
+      }
+    } finally {
+      dispatch(productLoading(false));
+      dispatch(setAlertMessage(alertMsg));
+    }
+  };
+
+export const readPaginatedShopPageFilteredProducts =
+  (
+    options: {
+      page: number;
+      limit: number;
+      sort: "createdAt";
+      query?: string;
+      min?: string;
+      max?: string;
+    },
+    callback?: () => void
+  ) =>
+  async (
+    dispatch: ThunkDispatch<
+      {},
+      {},
+      ShopPageFilteredPaginatedProducts | ProductLoading
+    >
+  ) => {
+    try {
+      dispatch(productLoading(true));
+      const {
+        data,
+        page: pageNumber,
+        total,
+      } = (await ProductServices.getFilteredProductsPerPage(options)).data as {
+        data: Product[];
+        total: number;
+        page: number;
+      };
+
+      dispatch({
+        type: "SHOP_PAGE_FILTERED_PAGINATED_PRODUCTS",
+        payload: { products: data, page: pageNumber, total },
+      });
+
+      if (callback) callback();
+    } catch ({ response }) {
+      printMessage(
+        "product.action => readPaginatedShopPageFilteredProducts()",
+        response
+      );
+      if (response?.data?.errors) {
+        alertMsg = createAlert("error", response.data.errors[0].message);
+      }
+    } finally {
+      dispatch(productLoading(false));
+      dispatch(setAlertMessage(alertMsg));
+    }
+  };
+
+export const readPaginatedShopPageProducts =
+  (
+    options: { page: number; limit: number; sort: "createdAt" },
+    callback?: () => void
+  ) =>
+  async (
+    dispatch: ThunkDispatch<{}, {}, ShopPagePaginatedProducts | ProductLoading>
+  ) => {
+    try {
+      dispatch(productLoading(true));
+      const {
+        data,
+        page: pageNumber,
+        total,
+      } = (await ProductServices.readHomePageProducts(options)).data as {
+        data: Product[];
+        total: number;
+        page: number;
+      };
+
+      dispatch({
+        type: "SHOP_PAGE_PAGINATED_PRODUCTS",
+        payload: { products: data, page: pageNumber, total },
+      });
 
       if (callback) callback();
     } catch ({ response }) {

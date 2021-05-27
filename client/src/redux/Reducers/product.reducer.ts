@@ -11,12 +11,15 @@ const initialState: ProductInitialState = {
   relatedProducts: {},
   categoryProducts: {},
   subCategoryProducts: {},
+  shopPage: {},
   singleProduct: null,
   bestSellersPageNumber: 0,
   pageNumber: 0,
+  shopPageProductsPageNumber: 0,
   totalProducts: 0,
   totalCategoryProducts: 0,
   totalSubCategoryProducts: 0,
+  totalShopPageProducts: 0,
 };
 
 // move this to a utility function
@@ -60,6 +63,18 @@ export default function (state = initialState, action: ProductActionTypes) {
           ...toObject(action.payload.products),
         },
         bestSellersPageNumber: action.payload.page,
+      };
+
+    case "SHOP_PAGE_PAGINATED_PRODUCTS":
+    case "SHOP_PAGE_FILTERED_PAGINATED_PRODUCTS":
+      return {
+        ...state,
+        shopPage: {
+          // ...state.shopPage,
+          ...toObject(action.payload.products),
+        },
+        shopPageProductsPageNumber: action.payload.page,
+        totalShopPageProducts: action.payload.total,
       };
 
     case "CREATE_PRODUCT":

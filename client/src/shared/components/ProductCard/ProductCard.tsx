@@ -38,7 +38,7 @@ export function ProductCard(props: Props) {
       ]}
     >
       <Card.Meta
-        title={product.title}
+        title={product.title + ` - $${product.price}`}
         description={
           <Paragraph ellipsis={true}>{product.description}</Paragraph>
         }

@@ -6,6 +6,7 @@ import OnBoardingRouter from "./OnBoarding";
 import UserRouter from "./User";
 import AdminRouter from "./Admin";
 import HomeRouter from "./Home";
+import { ShopPage } from "./Shop/ShopPage";
 import NotFound from "../shared/components/404NotFound";
 import { clearAlertMessage } from "../redux/actions/alert.action";
 import { RootState } from "../const/types";
@@ -57,6 +58,7 @@ function Routes(): ReactElement {
         <Route path={baseRoutes.ONBOARDING} component={OnBoardingRouter} />
         <Route path={baseRoutes.USER} component={UserRouter} />
         <Route path={baseRoutes.ADMIN} component={AdminRouter} />
+        <Route path={baseRoutes.SHOP} component={ShopPage} />
         <Route path={baseRoutes.HOME} component={HomeRouter} />
         <Route component={NotFound} />
       </Switch>

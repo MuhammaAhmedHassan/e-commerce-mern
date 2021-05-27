@@ -16,3 +16,10 @@ export function makeCamelCaseString({
   }
   return resultStr;
 }
+
+export const toObject = (arr: unknown) => {
+  return (arr as [{ _id: string }]).reduce((prv, cur) => {
+    prv[cur._id] = cur;
+    return prv;
+  }, {} as { [_id: string]: unknown });
+};

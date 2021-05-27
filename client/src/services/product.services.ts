@@ -1,10 +1,5 @@
-import axios from "axios";
 import { productApiRoutes } from "../const/apiRoutes";
-import {
-  Product,
-  ProductFormValues,
-  ResponseImageType,
-} from "../const/types/product";
+import { ProductFormValues } from "../const/types/product";
 import { HTTP } from "../utils/Http";
 
 // delete: deleteProduct maybe because 'delete' is a reserve word
@@ -19,6 +14,7 @@ const {
   relatedProducts,
   getCategoryProducts,
   getSubCategoryProducts,
+  filteredProductsPerPage,
 } = productApiRoutes;
 
 export class ProductServices {
@@ -92,5 +88,20 @@ export class ProductServices {
     const { subCategoryId, page, limit } = options;
     const url = getSubCategoryProducts.replace(":subCategoryId", subCategoryId);
     return HTTP(url + `?page=${page}&limit=${limit}`);
+  }
+
+  static async getFilteredProductsPerPage(options: {
+    query?: string;
+    categoryId?: string[];
+    rating?: number;
+    subCategoriesId?: string[];
+    min?: string;
+    max?: string;
+    page: number;
+    limit: number;
+    sort: "createdAt";
+  }) {
+    const url = filteredProductsPerPage;
+    return HTTP.post(url, options);
   }
 }

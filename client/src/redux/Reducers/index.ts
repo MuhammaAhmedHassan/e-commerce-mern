@@ -6,6 +6,7 @@ import error from "./error.reducer";
 import category from "./category.reducer";
 import subCategory from "./sub-category.reducer";
 import product from "./product.reducer";
+import search from "./search.reducer";
 
 export default combineReducers({
   router: connectRouter(history),
@@ -14,4 +15,5 @@ export default combineReducers({
   category,
   subCategory,
   product,
+  search,
 });
