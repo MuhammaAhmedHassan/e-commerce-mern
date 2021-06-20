@@ -92,7 +92,7 @@ export class ProductServices {
 
   static async getFilteredProductsPerPage(options: {
     query?: string;
-    categoryId?: string[];
+    categoriesIds?: string[];
     rating?: number;
     subCategoriesId?: string[];
     min?: string;

@@ -6,13 +6,14 @@ import { useSelector } from "react-redux";
 import qs from "querystring";
 import { baseRoutes } from "../../../const/routes";
 import { RootState } from "../../../const/types";
+import { makeUrlForShopPage } from "../../../utils/UtilityFunc";
 
 export function SearchForm() {
   const [form] = Form.useForm();
   const history = useHistory();
   const { search } = useLocation();
   const params = search.split("?").pop()!;
-  const { query, min, max } = qs.parse(params);
+  const { query, min, max, categoryIds } = qs.parse(params);
 
   const { loading } = useSelector(({ product }: RootState) => ({
     loading: product.loading,
@@ -21,7 +22,7 @@ export function SearchForm() {
   useEffect(() => {
     if ((query as string)?.trim())
       form.setFieldsValue({
-        search: query,
+        search: query ?? "",
       });
     return () => {
       form.setFieldsValue({
@@ -30,16 +31,10 @@ export function SearchForm() {
     };
   }, [query]);
 
-  const createUrl = (search: string) => {
-    let url = baseRoutes.SHOP + `?query=${search}`;
-    if (min) url += `&min=${min}`;
-    if (max) url += `&max=${max}`;
-    return url;
-  };
-
   const onFinishSearch = ({ search }: { search: string }) => {
-    const url = createUrl(search);
-    history.push(url);
+    history.push({
+      search: makeUrlForShopPage({ query: search, min, max, categoryIds }),
+    });
   };
 
   return (

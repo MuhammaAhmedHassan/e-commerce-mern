@@ -14,6 +14,7 @@ import { baseRoutes } from "../../../const/routes";
 import { RootState } from "../../../const/types";
 import { fetchCategories } from "../../../redux/actions/category.action";
 import { CheckboxValueType } from "antd/lib/checkbox/Group";
+import { makeUrlForShopPage } from "../../../utils/UtilityFunc";
 
 // submenu keys of first level
 const rootSubmenuKeys = ["sub1", "sub2", "sub4"];
@@ -34,8 +35,10 @@ const { Title } = Typography;
 export function Sidebar(props: RouteChildrenProps) {
   const { location, history } = props;
   const { search } = location;
-  const { query, min, max } = qs.parse(search.split("?").pop()!);
+  const { query, min, max, categoryIds } = qs.parse(search.split("?").pop()!);
   const dispatch = useDispatch();
+
+  const [catsIds, setCatsIds] = useState(categoryIds as string);
 
   const { loading, categories } = useSelector(
     ({ product, category }: RootState) => ({
@@ -52,19 +55,34 @@ export function Sidebar(props: RouteChildrenProps) {
   }, []);
 
   const handlePriceSliderChange = ([min, max]: [number, number]) => {
-    console.log(qs.parse(search.split("?").pop()!));
-    const url = baseRoutes.SHOP + `?query=${query}&min=${min}&max=${max}`;
-    history.push(url);
+    const minVal = min.toString() as string | string[];
+    const maxVal = max.toString() as string | string[];
+
+    history.push({
+      search: makeUrlForShopPage({
+        query,
+        min: minVal,
+        max: maxVal,
+        categoryIds,
+      }),
+    });
   };
 
   const handleClick = (e: MenuInfo) => {
     console.log("click ", e);
   };
 
-  const handleCategoriesSelect = (categoriesId: CheckboxValueType[]) => {
-    console.log("CheckboxValueType[]", categoriesId);
-    // make url and try
-    // or maybe set the categoriesIds in the redux
+  const handleCategoriesSelect = (_categoryIds: CheckboxValueType[]) => {
+    setCatsIds(_categoryIds.toString());
+
+    history.push({
+      search: makeUrlForShopPage({
+        query,
+        min,
+        max,
+        categoryIds: _categoryIds as string[] | string,
+      }),
+    });
   };
 
   return (
@@ -99,7 +117,7 @@ export function Sidebar(props: RouteChildrenProps) {
             disabled={loading}
             className={"categories-sidebar-list"}
             options={categories.map((c) => ({ label: c.name, value: c._id }))}
-            defaultValue={[]}
+            value={catsIds?.split(",") || []}
             onChange={handleCategoriesSelect}
           />
         </Menu.Item>

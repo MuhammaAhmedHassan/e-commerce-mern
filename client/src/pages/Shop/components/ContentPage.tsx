@@ -16,7 +16,7 @@ export function ContentPage(props: RouteChildrenProps) {
   const dispatch = useDispatch();
   const { location } = props;
   const { search } = location;
-  const { query, min, max } = qs.parse(search.split("?").pop()!);
+  const { query, min, max, categoryIds } = qs.parse(search.split("?").pop()!);
 
   const { loading, products, totalProducts, hasMore } = useSelector(
     ({ product }: RootState) => ({
@@ -42,7 +42,12 @@ export function ContentPage(props: RouteChildrenProps) {
   }, [query]);
 
   useEffect(() => {
-    if (!query && !min && !max) return;
+    // if (!query && !min && !max && !categoryIds) return;
+    let _catIds: string[] = [];
+    if (categoryIds)
+      _catIds = (categoryIds as string)
+        .split(",")
+        .filter((c) => c.trim() !== "");
     dispatch(
       readPaginatedShopPageFilteredProducts({
         page: 1,
@@ -51,10 +56,13 @@ export function ContentPage(props: RouteChildrenProps) {
         query: query as string,
         min: min as string,
         max: max as string,
+        categoriesIds: (categoryIds as string)
+          ?.split(",")
+          ?.filter((c) => c.trim() !== ""),
       })
     );
     return () => {};
-  }, [query, min, max]);
+  }, [query, min, max, categoryIds]);
 
   const handlePagination = (page: number) => {
     if (query) {

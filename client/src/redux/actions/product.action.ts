@@ -200,6 +200,7 @@ export const readPaginatedShopPageFilteredProducts =
       query?: string;
       min?: string;
       max?: string;
+      categoriesIds?: string[];
     },
     callback?: () => void
   ) =>

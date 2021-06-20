@@ -135,6 +135,8 @@ export const filteredProducts = async (req: Request, res: Response) => {
     req.body;
   const skip = limit * (page - 1);
 
+  console.log("FILTERED_PRODUCTS", categoriesIds);
+
   const query: any = {};
 
   if (keywords) query.$text = { $search: keywords };
