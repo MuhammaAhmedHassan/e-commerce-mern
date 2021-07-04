@@ -135,6 +135,10 @@ export const filteredProducts = async (req: Request, res: Response) => {
     req.body;
   const skip = limit * (page - 1);
 
+  if (rating) {
+    return filteredProductsWithRatingAndOtherFilters(req, res);
+  }
+
   console.log("FILTERED_PRODUCTS", categoriesIds);
 
   const query: any = {};
@@ -145,7 +149,7 @@ export const filteredProducts = async (req: Request, res: Response) => {
   // Maybe we'll have array of categories
   if (categoriesIds) query.category = { $in: categoriesIds };
   if (subCategoriesIds) query.subCategories = { $in: subCategoriesIds };
-  if (rating) query.rating = rating;
+  // if (rating) query.rating = rating;
 
   const products: LeanDocument<ProductDoc>[] = await Product.find(query)
     // .populate("category", "_id name")
@@ -157,12 +161,142 @@ export const filteredProducts = async (req: Request, res: Response) => {
     .lean()
     .exec();
 
+  // Rating
+
   // const totalProducts = await Product.find({ $text: { $search: keywords } })
   const totalProducts = await Product.find(query).count().lean().exec();
 
   const allProducts = { data: products, total: totalProducts, page };
 
   res.json(allProducts);
+};
+
+export const filteredProductsWithRatingAndOtherFilters = async (
+  req: Request,
+  res: Response
+) => {
+  const {
+    min = 0,
+    max = Number.MAX_SAFE_INTEGER,
+    categoriesIds,
+    subCategoriesIds,
+    rating,
+    limit = 10,
+    page = 1,
+    query: keywords,
+  } = req.body;
+
+  const skip = limit * (page - 1);
+  const query: any[] = [];
+
+  if (keywords) {
+    query.push({ $match: { $text: { $search: keywords } } });
+  }
+  query.push({
+    $project: {
+      document: "$$ROOT",
+      floorAverage: { $floor: { $avg: "$ratings.star" } },
+      // _id: "$_id",
+      // subCategories: "$subCategories",
+      // sold: "$sold",
+      // images: "$images",
+      // title: "$title",
+      // description: "$description",
+      // price: "$price",
+      // category: "$category",
+      // shipping: "$shipping",
+      // quantity: "$quantity",
+      // color: "$color",
+      // brand: "$brand",
+      // slug: "$slug",
+      // createdAt: "$createdAt",
+      // updatedAt: "$updatedAt",
+      // ratings: "$ratings",
+    },
+  });
+  if (rating) {
+    /** For multiple rating fields [] */
+    // { $match: { floorAverage: { $in: [3, 4] } } },
+    query.push({ $match: { floorAverage: rating } });
+  }
+  query.push({ $skip: limit * skip });
+  query.push({ $limit: limit });
+
+  if (typeof min !== "undefined" || typeof max !== "undefined") {
+    query.push({
+      $match: {
+        "document.price": {
+          $gte: min <= 0 || !min ? 1 : min,
+          $lte: max ?? Number.MAX_SAFE_INTEGER,
+        },
+      },
+    });
+    // ** Will work if we don't use document: "$$ROOT" **/
+    // query.push({
+    //   $match: {
+    //     price: {
+    //       $gte: min <= 0 ? 1 : min,
+    //       $lte: max ?? Number.MAX_SAFE_INTEGER,
+    //     },
+    //   },
+    // });
+  }
+
+  if (categoriesIds)
+    query.push({ $match: { "document.category": { $in: categoriesIds } } });
+  if (subCategoriesIds)
+    query.push({
+      $match: { "document.subCategories": { $in: subCategoriesIds } },
+    });
+
+  const products = await Product.aggregate([
+    ...query,
+    {
+      $facet: {
+        metadata: [{ $count: "totalProducts" }],
+        data: [{ $match: {} }],
+      },
+    },
+  ]).exec();
+
+  /** Working sample  */
+  // const products = await Product.aggregate([
+  //   { $match: { $text: { $search: "Mac" } } },
+  //   {
+  //     $project: {
+  //       document: "$$ROOT",
+  //       // _id: "$_id",
+  //       // subCategories: "$subCategories",
+  //       // sold: "$sold",
+  //       // images: "$images",
+  //       // title: "$title",
+  //       // description: "$description",
+  //       // price: "$price",
+  //       // category: "$category",
+  //       // shipping: "$shipping",
+  //       // quantity: "$quantity",
+  //       // color: "$color",
+  //       // brand: "$brand",
+  //       // slug: "$slug",
+  //       // createdAt: "$createdAt",
+  //       // updatedAt: "$updatedAt",
+  //       // ratings: "$ratings",
+  //       floorAverage: { $floor: { $avg: "$ratings.star" } },
+  //     },
+  //   },
+  //   { $match: { floorAverage: { $in: [3, 4] } } },
+  //   // {
+  //   //   $match: { "document.price": { $gte: 1, $lte: Number.MAX_SAFE_INTEGER } },
+  //   // },
+  //   {
+  //     $facet: {
+  //       metadata: [{ $count: "totalProducts" }],
+  //       data: [{ $match: {} }],
+  //     },
+  //   },
+  // ]).exec();
+
+  res.json({ products });
 };
 
 export const deleteProduct = async (req: Request, res: Response) => {
