@@ -219,8 +219,6 @@ export const filteredProductsWithRatingAndOtherFilters = async (
     // { $match: { floorAverage: { $in: [3, 4] } } },
     query.push({ $match: { floorAverage: rating } });
   }
-  query.push({ $skip: limit * skip });
-  query.push({ $limit: limit });
 
   if (typeof min !== "undefined" || typeof max !== "undefined") {
     query.push({
@@ -248,6 +246,9 @@ export const filteredProductsWithRatingAndOtherFilters = async (
     query.push({
       $match: { "document.subCategories": { $in: subCategoriesIds } },
     });
+
+  query.push({ $skip: limit * skip });
+  query.push({ $limit: limit });
 
   const products = await Product.aggregate([
     ...query,
